@@ -1,6 +1,7 @@
 \documentclass[a4paper,10pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[spanish]{babel}
+\usepackage{ marvosym }
 
 %opening
 \title{Apuntes Tema 1}
@@ -15,5 +16,22 @@ Los apuntes que vaya tomando en clase
 \end{abstract}
 
 \section{}
+\subsection{Introducción a ML}
+\paragraph{Ejemplo 1}
+Se pretende medir la temperatura ($t$) en un punto de una central nuclear, pero la temperatura es tan alta que no se puede medir directamente con ningún sensor. Se intentará deducir la temperatura así:
+\begin{itemize}
+\item $t$ - temperatura a predecir (variable)
+\item $x$ - vector de variables medibles que posiblemente inciden en $t$
+\item $z$ - vector de variables \textbf{NO medibles} que posiblemente inciden en $t$
+\end{itemize}
+
+La relación completa es $ t = \delta(x,z)$, que es una función.
+
+Pero no conocemos $z$ \MVRightarrow Aun conociendo $x$, el valor de $t$ oscila. La relación entre $t$ y $x$ se hace \textit{estocástica}
+
+
+
+\paragraph{Ejemplo 2}
+
 
 \end{document}
