@@ -29,9 +29,25 @@ La relación completa es $ t = \delta(x,z)$, que es una función.
 
 Pero no conocemos $z$ \MVRightarrow Aun conociendo $x$, el valor de $t$ oscila. La relación entre $t$ y $x$ se hace \textit{estocástica}
 
+$p(x,t)$ será la probabilidad de que con esa $x$ se tenga esa temperatura.
+
+Hay que construir una función $t = y(x)$ donde $t$ sea el valor más plausible. El problema es que no conocemos $p$
+
+La forma de atacar el problema será recolectar datos $\{(x_1,t_1),(x_2,t_2), \dots ,(x_n,t_n)\} = D$
+
+$(x_n,t_n) \sim^{i.i.p.} p$ (variables independientes e identicamente distribuidas)
+
+
+El objetivo del \textit{Machine Learning} (ML) es obtener $y$ a partir de $D$. En este caso es un problema de \textit{regresión}
+
 
 
 \paragraph{Ejemplo 2}
-
+Se tiene una planta de reciclaje, y se quieren clasificar los objetos que van pasando por la cinta. Los datos son:
+\begin{itemize}
+\item $t$ - tipo de producto
+\item $x$ - los atributos de los productos que captamos con una cámara
+\item $z$ - los atributos que no captamos con la cámara
+\end{itemize}
 
 \end{document}
