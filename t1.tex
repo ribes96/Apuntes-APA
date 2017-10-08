@@ -61,7 +61,7 @@ Tenemos $x \in \mathbb{R}$ y queremos predecir $t \in \mathbb{R}$ (\textit{Regre
 En todos los problemas nos encontraremos con:
 \begin{itemize}
 \item $x_n \in (0,1)$, $x_n \sim U(0,1) $, (un conjunto de observaciones)
-\item $t_n = sin(2\pi x_n) + \varepsilon, \varepsilon \in N(0,\sigma^2)$, normalmente $\sigma^2 = 0.3^2$, y donde $\varepsilon$ es el ruido aparentemente aleatorio, que proviene de los datos que no conocemos.
+\item $t_n = sin(2\pi x_n) + \varepsilon, \varepsilon \in N(0,\sigma^2)$, normalmente $\sigma^2 = 0.3^2$, y donde $\varepsilon$ es el ruido aparentemente aleatorio, que proviene de los datos que no conocemos o de errores en la medición.
 \end{itemize}
 
 Vamos a intentar ajustar los datos. Sabemos que si los datos son continuos (no dan saltos) podemos ajustarlos con un polinomio en un intervalo:
@@ -116,16 +116,26 @@ La respuesta es que espontaneamente esto no pasa, puesto que para igualar los da
 
 La función de error queda así:
 \begin{equation*}
-E(C) = \frac{1}{2} \sum_{n = 1}^{N} \Big( y(x_n;C) - t_n\Big)^2 \frac{\lambda}{2}||c||^2
+E(C) = \frac{1}{2} \sum_{n = 1}^{N} \Big( y(x_n;C) - t_n\Big)^2 + \frac{\lambda}{2}||c||^2
 \end{equation*}
 
 El $\frac{\lambda}{2}$ es simplemente para que al derivar quede más simple. Podría ser solo $\lambda$
 
 \subsection{Conceptos de inferencia estadística}
 
-$D = \{x_1, \dots x_n\}$ es una realización de una variable aleatoria (v.a.) $X_n$ que tiene una función de distribución $x_n;\theta), \theta \in \Theta$
+$D = \{x_1, \dots x_n\}$ es una realización de una variable aleatoria (v.a.) $X_n$ que tiene una función de distribución conocida $p(x_n;\theta), \theta \in \Theta$
+
+Pero esa función de distribución tiene unos parámetros, y nos gustaría saber cuáles usar.
+
+Por ejemplo, si se trata de una distribución normal, sabemos que nuestros datos se corresponden con $N(x, \mu, \sigma^2)$, pero viendo los datos no sabemos qué valores de $\mu$ y $\sigma^2$ deberíamos cojer para que se adaptaran lo más posible a los datos que tenemos.
+
+Vamos a cojer los datos que maximicen nuestra verosimilitud (likelihood), esto es, los que hagan que sea más probable recoger los datos $D$
 
 El objetivo es obtener una estimación $\hat{\theta}$ de $\theta$, dado $D$
+
+La probabilidad de recoger una muestra $x_i$ es $p(x_i,\theta)$
+
+Puesto que sabemos que los datos son i.i.d, la probabilidad de cojer todos los datos $D$ es el producto de cada uno de ellos.
 
 La probabilidad de obtener $D$ es:
 \begin{equation*}
@@ -141,7 +151,11 @@ Definimos la función de verosimilitud (likelihood) así:
 \theta \rightarrow \mathcal{L}(\theta) = P_n(D;\theta)
 \end{equation*}
 
-El estimador de máxima verosimilitud es $\hat{\theta} = \text{argmax} \mathcal{L}(\theta)$, $\theta \in \Theta$
+Es decir, es una función que indica cómo de probable es haber recogido los datos $D$ usando los parámetros $\theta$.
+
+Elegiremos los paráetros $\theta$ que maximicen esa probabilidad, los que maximicen $P(D,\theta) = \prod_{n = 1}^{N} p(x_n,\theta)$
+
+El estimador de máxima verosimilitud es $\hat{\theta} = \text{argmax}\  \mathcal{L}(\theta)$, $\theta \in \Theta$
 
 Si es de una sola variable, la forma de hacerlo es derivar e igualar a 0.
 
@@ -151,8 +165,113 @@ Es conveniente operar con el logaritmo de $\alpha$, pues simplifica la maximizac
 \end{equation*}
 
 \subsubsection*{Ejemplo}
+Tenemos un conjunto de datos $D = \{x_1,x_2,\dots, x_n\}$ que siguen una distribución normal $X_n \sim N(x_n,\mu, \sigma^2)$
 
-\textit{Por aquí en medio van más cosas, que todavia no he puesto}
+Se sabe que la función de densidad de la distrubión normal es:
+
+\begin{equation*}
+  N(x, \mu, \sigma^2) = \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x - \mu)^2}{2\sigma^2}}
+\end{equation*}
+
+Entonces la probabilidad de haber cogido los datos $D$ es:
+
+\begin{equation*}
+  P(D, \mu, \sigma^2) = \prod_{i = 1}^{n} \Big( \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x_i - \mu)^2}{2\sigma^2}} \Big)
+\end{equation*}
+
+Pero para hacer los cálculos más sencillos trabajaremos con el logaritmo, que no cambia los máximos relativos. Además, le vamos a cambiar el signo, y ya no buscaremos maximizarlo, sino minimizarlo.
+
+\begin{equation*}
+  l = -\ln(P(D, \mu, \sigma^2)) = -\ln \prod_{i = 1}^{n} \Big( \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x_i - \mu)^2}{2\sigma^2}} \Big) = -\sum_{i = 1}^{N} \ln \big( \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x_i - \mu)^2}{2\sigma^2}} \big)
+\end{equation*}
+
+Se simplifica así:
+
+\begin{equation*}
+  l = -\sum_{i = 1}^{N} \ln \big( \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x_i - \mu)^2}{2\sigma^2}} \big)
+\end{equation*}
+
+\begin{equation*}
+  l = -\sum_{i = 1}^{N} \Big[ \ln \big( \frac{1}{\sigma\sqrt{2\pi}} \big) + \ln \big( e^{-\frac{(x_i - \mu)^2}{2\sigma^2}} \big) \Big]
+\end{equation*}
+
+\begin{equation*}
+  l = -\sum_{i = 1}^{N} \Big[ -\ln \big( \sigma\sqrt{2\pi} \big) - \frac{(x_i - \mu)^2}{2\sigma^2} \Big]
+\end{equation*}
+
+\begin{equation*}
+  l = \sum_{i = 1}^{N} \Big[ \ln \big( \sigma\sqrt{2\pi} \big) + \frac{(x_i - \mu)^2}{2\sigma^2} \Big]
+\end{equation*}
+
+Ahora derivamos respecto de $\mu$ y de $\sigma^2$ e igualamos a 0 para encontrar los extremos:
+
+\begin{equation*}
+\frac{\partial l}{\partial \mu} = \sum_{i = 1}^{N} \Big[ 0 + \frac{1}{2\sigma^2} \cdot 2(x_i - \mu)(-1) \Big]
+\end{equation*}
+
+\begin{equation*}
+\frac{\partial l}{\partial \mu} = \sum_{i = 1}^{N} \Big[ -\frac{x_i - \mu}{\sigma^2} \Big]
+\end{equation*}
+
+\begin{equation*}
+\frac{\partial l}{\partial \mu} = -\frac{1}{\sigma^2}\sum_{i = 1}^{N} \Big[ x_i - \mu \Big] = 0
+\end{equation*}
+
+\begin{equation*}
+\sum_{i = 1}^{N} x_i - \sum_{i = 1}^{N} \mu = 0
+\end{equation*}
+
+\begin{equation*}
+\sum_{i = 1}^{N} x_i - N\mu = 0
+\end{equation*}
+
+\begin{equation*}
+\sum_{i = 1}^{N} x_i = N\mu
+\end{equation*}
+
+\begin{equation*}
+\mu = \frac{1}{N}\sum_{i = 1}^{N} x_i
+\end{equation*}
+
+Y respecto de $\sigma^2$:
+
+\begin{equation*}
+  l = \sum_{i = 1}^{N} \Big[ \ln \big( \sigma\sqrt{2\pi} \big) + \frac{(x_i - \mu)^2}{2\sigma^2} \Big]
+\end{equation*}
+
+\begin{equation*}
+  \frac{\partial l}{\partial \sigma^2} = \sum_{i = 1}^{N} \Big[ \frac{1}{\sigma\sqrt{2\pi}} \cdot \frac{\sqrt{2\pi}}{2\sigma} + \frac{(x_i - \mu)^2}{2} \big( -\frac{1}{\sigma^4} \big) \Big]
+\end{equation*}
+
+\begin{equation*}
+  \frac{\partial l}{\partial \sigma^2} = \sum_{i = 1}^{N} \Big[ \frac{1}{2\sigma^2} - \frac{(x_i - \mu)^2}{2\sigma^4} \Big] = 0
+\end{equation*}
+
+\begin{equation*}
+\sum_{i = 1}^{N} \Big[ \frac{1}{2\sigma^2} \Big] - \sum_{i = 1}^{N} \Big[\frac{(x_i - \mu)^2}{2\sigma^4} \Big] = 0
+\end{equation*}
+
+\begin{equation*}
+\frac{N}{2\sigma^2} = \frac{1}{2\sigma^4}\sum_{i = 1}^{N} (x_i - \mu)^2
+\end{equation*}
+
+\begin{equation*}
+\sigma^2 = \frac{1}{N}\sum_{i = 1}^{N} (x_i - \mu)^2
+\end{equation*}
+
+De este modo hemos encontrado las ecuaciones clásicas para encontrar la media y la varianza muestral, que son la media y varianza más probables teniendo en cuenta los datos que hemos recogido.
+
+Se podría aplicar el mismo procedimiento con alguna otra distribución.
+
+\hspace{1cm}
+
+\textit{Nota: habría que asegurarse que realmente se trata de mínimos mirando la segunda derivada y comprobando que da valores positivos. Se deja como ejercicio}
+
+%1.4
+\subsection{Propiedades de un estimador}
+
+
+
 
 %2
 \section{Reducción de dimensión}
@@ -320,4 +439,8 @@ Si queremos quedarnos con $m$ componentes principales y en total había $d$ ($m 
 \end{equation*}
 
 Es el porcentaje de la varianza con el que nos estamos quedando
+
+
+
+
 \end{document}
