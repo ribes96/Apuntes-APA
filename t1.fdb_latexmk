@@ -1,7 +1,6 @@
 # Fdb version 3
-["pdflatex"] 1507464522 "t1.tex" "/home/hobber/git/Apuntes-APA/t1.pdf" "t1" 1507464523
-  "/etc/texmf/web2c/texmf.cnf" 1505947220 1101 af7716885e081ab43982cab7b4672c1a ""
-  "/home/hobber/git/Apuntes-APA/t1.aux" 1507464523 1049 1893b36b22993378b4c9689008ae5e82 ""
+["pdflatex"] 1507619090 "t1.tex" "t1.pdf" "t1" 1507619096
+  "/etc/texmf/web2c/texmf.cnf" 1507233364 1101 af7716885e081ab43982cab7b4672c1a ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1272929888 3287 e6b82fe08f5336d4d5ebc73fb1152e87 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1246382020 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
@@ -70,13 +69,13 @@
   "/usr/share/texlive/texmf-dist/tex/latex/marvosym/umvs.fd" 1169658918 111 395c88825a74c0d7a4afff69645f4d03 ""
   "/usr/share/texlive/texmf-dist/web2c/texmf.cnf" 1503343927 31343 93828589fb0cea665e553ee5a17ad2d4 ""
   "/usr/share/texmf/web2c/texmf.cnf" 1503343927 31343 93828589fb0cea665e553ee5a17ad2d4 ""
-  "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1505966216 1863403 f3ff9a4253bcb5fb9a9baaf0c572cb01 ""
-  "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1505947551 3853367 a20359e0b869a55275d23bc976d40ed8 ""
-  "t1.aux" 1507464523 1049 1893b36b22993378b4c9689008ae5e82 ""
-  "t1.tex" 1507464522 20288 a7e3ad3ca404f8dce9eb3c69ce2103c5 ""
+  "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1507233463 1863403 f3ff9a4253bcb5fb9a9baaf0c572cb01 ""
+  "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1507233532 3858574 0d6efb5d498cbc0274315abbf3110203 ""
+  "t1.aux" 1507619095 1049 1893b36b22993378b4c9689008ae5e82 ""
+  "t1.tex" 1507619088 20288 a7e3ad3ca404f8dce9eb3c69ce2103c5 ""
   (generated)
-  "/home/hobber/git/Apuntes-APA/t1.pdf"
-  "t1.aux"
-  "t1.log"
   "t1.pdf"
   "/home/hobber/git/Apuntes-APA/t1.log"
+  "/home/hobber/git/Apuntes-APA/t1.pdf"
+  "t1.log"
+  "t1.aux"
