@@ -508,6 +508,54 @@ Ahora faltaría ver cómo se encuentra la segunda mitad. Queda para más adelant
 
 \subsection{Mezcla de Gaussianas (Mixture of Gaussians MoG)}
 
+El método de K-means tiene el problema de que es binario: un dato pertenece a un cluster o no pertenece, y solamente pertenece a uno. Dos datos que estén muy ``cerca'' pueden quedar en dos clusters distintos a pesar de que sean muy parecidos.
+
+Otra forma de verlo es que un dato pertenezca a un cluster con una cierta probabilidad. Para ello habría que definir una función de distribución que reflejara la asignación de datos a los distintos clústers. El problema es que una distribución simple (como la normal o la binomial) no tiene la capacidad para reflejar cualquier cantidad de datos y clusters. Por ello vamos a usar la Mezcla de Gaussianas. Esto no es más que asignar una distribución gaussiana (o normal) a cada uno de los clusters, y hacer la suma. De este modo con una cantidad suficiente de distribuciones normales podemos representar cualquier función de probabilidad.
+
+Formalizamos el problema.
+
+Tenemos un conjunto de datos $D = \{x_1, x_2, \dots, x_n\}, x_i \in \mathbb{R}^d$ y queremos definir $K$ clusters. Diremos que $\pi_k$ es la probabilidad que el cluster $k$ genere un dato cualquiera. Deberá cumplirse que $\sum_{k = 1}^K \pi_k = 1$
+
+Entonces la probabilidad de que el dato $x$ sea generado es:
+
+\begin{equation*}
+p(x) = \sum_{k = 1}^{K} \pi_k \cdot \mathcal{N}(x; \mu_k, \Sigma_k)
+\end{equation*}
+
+Si queremos generar datos siguiendo una MoG, lo primero que hay que hacer es elegir qué componente generará el dato, según la probabilidad que tengan ($\pi_k$) y después generar un dato siguiendo la distribución normal que esta define, como ya se ha hecho siempre.
+
+Para simplificar la notación a partir de ahora, supondremos la existencia de un vector $z$ que indicará componentes principales. Se trata de un vector binario de $K$ elementos en el que todos los elementos son $0$ excepto uno, que tiene un $1$ y que indica de qué componente se trata.
+
+Entonces diremos que:
+\begin{equation*}
+p(z_k = 1) = \pi_k
+\end{equation*}
+
+\begin{equation*}
+p(z) = \prod_{k = 1}^{K} \pi_k^{z_k}
+\end{equation*}
+
+De hecho, se puede entender como $p(z) = \pi_1 \cdot \pi_2 \cdot \dots \cdot \pi_K$
+
+De la misma manera podemos decir que:
+
+\begin{equation*}
+p(x | z_k = 1) = \mathcal{N}(x; \mu_k, \Sigma_k)
+\end{equation*}
+
+\begin{equation*}
+p(x | z) = \sum_{k = 1}^{K} z_k \cdot \mathcal{N}(x; \mu_k, \Sigma_k) \text{(La misma que antes hemos definido como p(x))}
+\end{equation*}
+
+
+
+
+
+
+
+
+
+
 
 
 
