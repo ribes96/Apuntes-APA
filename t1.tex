@@ -5,7 +5,7 @@
 \usepackage{ marvosym }
 \usepackage{amssymb}
 \usepackage{amsmath}
-
+% \usepackage{listings}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%
@@ -549,15 +549,171 @@ p(x | z) = \sum_{k = 1}^{K} z_k \cdot \mathcal{N}(x; \mu_k, \Sigma_k) \text{(La 
 
 
 
+% TODO me estoy dejando una parte aquí
+
+Ahora vendrían más cosas, pero sigo con otro tema
+
+\section{Modelos lineales de regresión}
+Lo que se vió en el tema 1 sobre el ajuste polinómico no es más que un caso concreto de los modelos lineales de regresión,
+en el que las funciones de base eran obligatoriamente exponenciales.
+
+Ahora vamos a ver el caso genérico.
+
+\subsection{Introducción al concepto de función de base (Basis Function, BF)}
+Si tenemos datos $x \in \mathbb{R}^d$, y queremos predecir un dato $t$, igual que con el ajuste polinómico, definimos una colección de funciones $\phi_j: \mathbb{R}^d \rightarrow \mathbb{R}$ para definir el siguiente modelo:
+
+% Entonces podemos definir un modelo como:
+
+\begin{equation*}
+y(x,w) = \phi_0(x) + \sum_{j = 1}^{n-1} w_j\phi_j(x), 
+\end{equation*}
+
+El caso del ajuste polinómico es cuando se establece la condición de que $\phi_j(x) = x^j$. Ahora podemos usar un conjunto
+más grande de funciones de base, incluídos los senos y cosenos.
+
+\subsection{El método de mínimos cuadrados}
+Como siempre, consideraremos:
+
+\begin{equation*}
+t = f(x) - \epsilon, \epsilon \sim \mathcal{N}(0, \sigma^2)
+\end{equation*}
+
+Es decir, que los datos de salida dependen de los datos que podemos medir ($x$) y de datos que no podemos pedir ($\epsilon$), que consideraremos ruido, y trabajaremos con la asunción de que ese ruido sigue una distribución normal centrada en $0$ y con varianza $\sigma^2$.
+
+Entonces definiremos:
+
+\begin{equation*}
+p(t | x, w, \sigma^2) = \mathcal{N}(t; y(x,w), \sigma^2)
+\end{equation*}
+
+Esto es, la probabilidad de que la salida sea $t$ asumiendo los datos $x, w, \sigma^2$.
+
+Abordamos el problema de decidir qué parámetros $w \in \mathbb{R}^M$ y $\sigma^2 \in \mathbb{R}$ deberíamos elegir para modelar los más acertadamente posible un conjunto de datos $D = \{x_1, x_2, \dots, x_n\}, x_i \in \mathbb{R}^d$ (que son i.i.d)
+que da como resultado $t \in \mathbb{R}^N$
+
+Igual que en ajuste polinómico, todavía no sabemos qué cantidad de funciones de base deberíamos usar. De momento, definimos que usaremos $M$ funciones de base.
+
+Se usará para los siguientes cálculos la notación matricial, que deja implícitos muchos cálculos. Para que se entienda bien, se definen los siguientes datos:
+
+
+\begin{equation*}
+X = 
+\begin{bmatrix}
+\leftarrow & x_1 & \rightarrow \\
+\leftarrow & x_2 & \rightarrow \\
+\vdots \\
+\leftarrow & x_n & \rightarrow \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+x_{11} & x_{12} & \dots & x_{1d} \\
+x_{21} & x_{22} & \dots & x_{2d} \\
+\vdots & \vdots & \ddots & \vdots \\
+x_{n1} & x_{n2} & \dots & x_{nd}
+\end{bmatrix}
+\end{equation*}
 
 
 
+\begin{equation*}
+t = 
+\begin{bmatrix}
+t_1 \\
+t_2 \\
+\vdots \\
+t_n
+\end{bmatrix}
+\end{equation*}
+
+\begin{equation*}
+\phi = 
+\begin{bmatrix}
+\phi_1 \\
+\phi_2 \\
+\vdots \\
+\phi_M
+\end{bmatrix}
+\end{equation*}
 
 
 
+\begin{equation*}
+\Phi =
+\begin{bmatrix}
+\phi_0(x_1) & \phi_1(x_1) & \dots & \phi_{M-1}(x_1) \\
+\phi_0(x_2) & \phi_1(x_2) & \dots & \phi_{M-1}(x_2) \\
+\vdots & \vdots & \ddots & \vdots \\
+\phi_0(x_n) & \phi_1(x_n) & \dots & \phi_{M-1}(x_n) \\
+\end{bmatrix}
+\end{equation*}
+
+Sacamos entonces la función de verosimilitud que ofrecen los parámetros $\theta = (w, \sigma^2)$ usando el logaritmo negado de la probabilidad de obtener los datos $t$ mediante los datos $X$. Esta función es la que habrá que maximizar.
+
+\begin{align*}
+-l(\theta) = \\
+-l(w, \sigma^2) =\\
+% 
+-\ln P(t | X, w, \sigma^2) = \\
+% 
+-\ln \prod_{i}^{N} p(t_i | X_i, w, \sigma^2) = \\
+% 
+-\ln \prod_{i = 1}^{N} \mathcal{N}(t_i; y(x_i, w), \sigma^2) = \\
+% 
+-\ln \prod_{i = 1}^{N} \mathcal{N}(t_i; w^T\phi x_i, \sigma^2) = 
+			&& \textit{entiéndase bien la notación}\\
+% 
+-\sum_{i = 1}^{N} \Big(\ln \mathcal{N}(t_i; w^T\phi x_i, \sigma^2) \Big) = \\
+% 
+-\sum_{i = 1}^{N} \Big(\ln \big(
+\frac{1}{\sqrt{2\pi\sigma^2}}exp\Big[\frac{(t_i - w^T\phi x_i)^2}{2\sigma^2}\Big]
+\big) \Big) = \\
+% 
+-\sum_{i = 1}^{N} \Big(-\ln \sqrt{2\pi\sigma^2} -
+\frac{(t_i - w^T\phi x_i)^2}{2\sigma^2}
+\Big) = \\
+% 
+N\ln \sqrt{2\pi\sigma^2} + \frac{1}{2\sigma^2} \sum_{i = 1}^{N} (t_i - w^T\phi x_i)^2
+\end{align*}
 
 
+Definimos:
+
+\begin{equation*}
+E(w) = \frac{1}{2} \sum_{i = 1}^{N} (t_i - w^T\phi x_i)^2
+\end{equation*}
+
+Y por lo tanto:
+
+\begin{equation*}
+-l(\theta) = N\ln(\sqrt{2\pi\sigma^2}) + \frac{1}{\sigma^2} E(w)
+\end{equation*}
+
+Se puede observar que:
+\begin{equation*}
+w^T\phi x_i \equiv \Phi w
+\end{equation*}
+Y entonces se podría cambiar la definición por:
+
+\begin{equation*}
+E(w) = 
+\frac{1}{2} \sum_{i = 1}^{N} (t_i - w^T\phi x_i)^2 =
+\frac{1}{2}||t - \Phi w||^2
+\end{equation*}
+
+\begin{equation*}
+E(w) = 
+\frac{1}{2}||t||^2 + \frac{1}{2}||\Phi w||^2 - t^T\Phi w
+\end{equation*}
 
 
+Ahora hay que derivar $-l(\theta)$ e igualar a $0$ para encontrar los extremos:
 
+\begin{align*}
+\frac{\partial (-l)}{\partial w} = 
+\frac{\partial E(w)}{\partial w} = 0 \equiv\\
+% 
+0 + 2\cdot \frac{1}{2}(\Phi w)^T\Phi - t^T\Phi = 0 \equiv \\
+% 
+\Phi^T\Phi w = \Phi^Tt
+\end{align*}
 \end{document}
