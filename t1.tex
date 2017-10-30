@@ -53,7 +53,7 @@ $p(x,t)$ será la probabilidad de que con esa $x$ se tenga esa temperatura.
 
 Hay que construir una función $t = y(x)$ donde $t$ sea el valor más plausible. El problema es que no conocemos $p$
 
-La forma de atacar el problema será recolectar datos $\{(x_1,t_1),(x_2,t_2), \dots ,(x_n,t_n)\} = D$
+La forma de atacar el problema será recolectar datos $\{(x_1, t_1),(x_2, t_2), \dots ,(x_n, t_n)\} = D$
 
 $(x_n,t_n) \sim^{i.i.p.} p$ (variables independientes e identicamente distribuidas)
 
@@ -479,7 +479,7 @@ El criterio será minimizar la suma de distancias de cada dato $x_i$ a su cluste
 Definimos una variable binaria $\pi_{ik}$:
 
 \begin{equation*}
-\pi_{ik} = 
+\pi_{ik} =
 \begin{cases}
 1 & \text{ si el dato $x_i$ está asignado al cluster $k$} \\
 0  & \text{ otherwise}
@@ -565,7 +565,7 @@ Si tenemos datos $x \in \mathbb{R}^d$, y queremos predecir un dato $t$, igual qu
 % Entonces podemos definir un modelo como:
 
 \begin{equation*}
-y(x,w) = \phi_0(x) + \sum_{j = 1}^{n-1} w_j\phi_j(x), 
+y(x,w) = \phi_0(x) + \sum_{j = 1}^{n-1} w_j\phi_j(x),
 \end{equation*}
 
 El caso del ajuste polinómico es cuando se establece la condición de que $\phi_j(x) = x^j$. Ahora podemos usar un conjunto
@@ -575,7 +575,7 @@ más grande de funciones de base, incluídos los senos y cosenos.
 Como siempre, consideraremos:
 
 \begin{equation*}
-t = f(x) - \epsilon, \epsilon \sim \mathcal{N}(0, \sigma^2)
+t = f(x) + \epsilon, \epsilon \sim \mathcal{N}(0, \sigma^2)
 \end{equation*}
 
 Es decir, que los datos de salida dependen de los datos que podemos medir ($x$) y de datos que no podemos pedir ($\epsilon$), que consideraremos ruido, y trabajaremos con la asunción de que ese ruido sigue una distribución normal centrada en $0$ y con varianza $\sigma^2$.
@@ -597,7 +597,7 @@ Se usará para los siguientes cálculos la notación matricial, que deja implíc
 
 
 \begin{equation*}
-X = 
+X =
 \begin{bmatrix}
 \leftarrow & x_1 & \rightarrow \\
 \leftarrow & x_2 & \rightarrow \\
@@ -616,7 +616,7 @@ x_{n1} & x_{n2} & \dots & x_{nd}
 
 
 \begin{equation*}
-t = 
+t =
 \begin{bmatrix}
 t_1 \\
 t_2 \\
@@ -626,7 +626,7 @@ t_n
 \end{equation*}
 
 \begin{equation*}
-\phi = 
+\phi =
 \begin{bmatrix}
 \phi_1 \\
 \phi_2 \\
@@ -652,26 +652,26 @@ Sacamos entonces la función de verosimilitud que ofrecen los parámetros $\thet
 \begin{align*}
 -l(\theta) = \\
 -l(w, \sigma^2) =\\
-% 
+%
 -\ln P(t | X, w, \sigma^2) = \\
-% 
+%
 -\ln \prod_{i}^{N} p(t_i | X_i, w, \sigma^2) = \\
-% 
+%
 -\ln \prod_{i = 1}^{N} \mathcal{N}(t_i; y(x_i, w), \sigma^2) = \\
-% 
--\ln \prod_{i = 1}^{N} \mathcal{N}(t_i; w^T\phi x_i, \sigma^2) = 
+%
+-\ln \prod_{i = 1}^{N} \mathcal{N}(t_i; w^T\phi x_i, \sigma^2) =
 			&& \textit{entiéndase bien la notación}\\
-% 
+%
 -\sum_{i = 1}^{N} \Big(\ln \mathcal{N}(t_i; w^T\phi x_i, \sigma^2) \Big) = \\
-% 
+%
 -\sum_{i = 1}^{N} \Big(\ln \big(
 \frac{1}{\sqrt{2\pi\sigma^2}}exp\Big[\frac{(t_i - w^T\phi x_i)^2}{2\sigma^2}\Big]
 \big) \Big) = \\
-% 
+%
 -\sum_{i = 1}^{N} \Big(-\ln \sqrt{2\pi\sigma^2} -
 \frac{(t_i - w^T\phi x_i)^2}{2\sigma^2}
 \Big) = \\
-% 
+%
 N\ln \sqrt{2\pi\sigma^2} + \frac{1}{2\sigma^2} \sum_{i = 1}^{N} (t_i - w^T\phi x_i)^2
 \end{align*}
 
@@ -695,13 +695,13 @@ w^T\phi x_i \equiv \Phi w
 Y entonces se podría cambiar la definición por:
 
 \begin{equation*}
-E(w) = 
+E(w) =
 \frac{1}{2} \sum_{i = 1}^{N} (t_i - w^T\phi x_i)^2 =
 \frac{1}{2}||t - \Phi w||^2
 \end{equation*}
 
 \begin{equation*}
-E(w) = 
+E(w) =
 \frac{1}{2}||t||^2 + \frac{1}{2}||\Phi w||^2 - t^T\Phi w
 \end{equation*}
 
@@ -709,11 +709,44 @@ E(w) =
 Ahora hay que derivar $-l(\theta)$ e igualar a $0$ para encontrar los extremos:
 
 \begin{align*}
-\frac{\partial (-l)}{\partial w} = 
+\frac{\partial (-l)}{\partial w} =
 \frac{\partial E(w)}{\partial w} = 0 \equiv\\
-% 
+%
 0 + 2\cdot \frac{1}{2}(\Phi w)^T\Phi - t^T\Phi = 0 \equiv \\
-% 
+%
 \Phi^T\Phi w = \Phi^Tt
 \end{align*}
+
+Esa matrix, $\Phi^T\Phi$, se llama \textit{matrix de diseño}.
+
+Y ahora habría que encontrar $w$ en función de las matrices y de $t$. Hay unas cuantas formas de abordar el problema, y la opción más obvia no da muy buenos resultados.
+
+\subsubsection{Con la función inversa}
+La primera forma de atacar el problema podría ser intentar resolver:
+
+\begin{equation*}
+w = (\Phi^T\Phi)^{-1}\Phi^Tt
+\end{equation*}
+
+Y esto asumiendo que existe la función inversa de la \textit{matriz de diseño}. Existe un teorema que demuestra que en este caso particular sí que tiene inversa, y se llama \textit{inversa de Moore-Penrose}
+
+% TODO escribir el teorema, que está en los apuntes
+
+El problema que tiene este método es que el cálculo de la inversa incluye números muy pequeños, muy cerca de $0$, y los ordenadores tienen problemas para calcularla, y cometen errores de \textit{underflow}.
+
+\subsubsection{SVD: Singular Vaue Decomposition}
+ Para solucionar ese problema, hay un teorema que dice que toda matriz $A_{N\timesM}, N > M$, se puede expresar como:
+
+ \begin{equation*}
+   A = U\Delta V^T
+ \end{equation*}
+
+ Donde:
+
+ \begin{itemize}
+   \item $U$ y $V$ son ortogonales, i.e: $U^TU = I$, $V^TV = I$
+   \item 
+ \end{itemize}
+
+
 \end{document}
