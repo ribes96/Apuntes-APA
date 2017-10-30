@@ -1,0 +1,172 @@
+% 2
+\section{Reducción de dimensión}
+Para hacer \textit{Machine Learning} es interesante tener los datos lo más simplificados posible, pues eso evita el sobre-ajuste. Existen muchos métodos para reducir la dimensión de un problema. Reducir la dimensión se podría entender como quedarse con una sombra de la imagen real que tenemos. Esto es: si todos los datos que tenemos estuvieran en 3 dimensiones, podría interesarnos trabajar con la sombra que proyectan esos datos, de manera que trabajaríamos con solo 2 dimensiones.
+
+Pues hacemos los mismo, pero con muchas dimensiones.
+
+Las ventajas que tiene esto son que evita el sobre-ajuste, nos permite entender mejor los datos y que son más fáciles de representar, con plots o dibujos.
+
+Pero hay que cojer una buena proyección de los datos reales. Puesto que está claro que vamos perder información (datos, en realidad), cojeremos una proyección que refleje lo que nos interesa, y que deseche otras cosas.
+
+Es por eso que hay muchas formas de reducir la dimensión de un conjunto de datos, cada una según la prioridad que uno tenga, y cogiendo las proyecciones más adecuadas para cada necesidad.
+
+Ahora veremos algunas de las formas de reducir la dimensión:
+\subsection{Principal Components Analisis (PCA)}
+Este algoritmo tiene como prioridad preservar la varianza de los datos, maximizar la dispersión en las proyecciones.
+
+Esto es, en la analogía de la sombra, cojer la sombra que tenga más area.
+
+De forma más técnica:
+
+Tenemos una muestra de datos $\{X_1,X_2,\dots, X_n\}, X_i \in \mathbb{R}^d$ que provienen de un vector aleatorio $X = \{X_1,\dots,X_n\}^T$. Cada una de las $X_i$ es una variable (aleatoria?) y tenemos $d$ muestras en cada una de las variables.
+
+Disponemos también de la matriz de covarianzas $\Sigma$.
+
+La matriz de covarianzas es una matriz de $n \times n$ donde $\Sigma_{ij}$ es $\text{var(}X_i,X_j\text{)}$ si $i \neq j$ y $\Sigma_{ii}$ es $\sigma_i^2$
+
+Tenemos datos en $n$ dimensiones, y decidimos que queremos únicamente $k$ dimensiones, $k < n$, y no cualesquiera dimensiones, sino las que maximicen la varianza.
+
+Hemos de encontrar entonces $k$ vectores $n$-dimensionales. Encontraremos $n$ vectores que serán todos ``perpendiculares'' entre ellos y cojeremos los $k$ vectores que tengan más varianza.
+
+Nuestro objetivo entonces obtener un nuevo sistema de coordenadas $Y = (Y_1,\dots,Y_n)$ que cumpla estas condiciones:
+\begin{enumerate}
+  \item Covar($Y_i,Y_j$) $ = 0$ si $i \neq j$
+  \item Var($Y_1$) $>$ Var($Y_2$) $> \dots > $ Var($Y_n$) (de hecho los ordenaremos decrecientemente)
+  \item $\sum_{i = 1}^{d} Var(X_i) = \sum_{i = 1}^{d} Var(Y_i)$
+\end{enumerate}
+
+Encontraremos la proyección $Y_i$ encontrando un vector $w_i$ que cumpla que $Y_i = w_i^T \cdot X$
+
+Como hay muchos vectores que cumplen esa condición (vectores que tienen todos la misma dirección, pero distinto módulo) establecemos la condición sobre $w_i$ de que la norma 2 al cuadrado sea 1, esto es: $||w_i||_2^2 = 1 \Rightarrow w_{i1}^2 + w_{i2}^2 + \dots + w_{in}^2 = 1$
+
+Objetivo: $w_1$ ha de maximizar la varianza de $Y_i$, sujeto a que $||w_i|| = 1$
+
+\begin{equation*}
+  Var(Y_i) = Var(w_i^T \cdot X) = w_1^T \cdot Var(X) \cdot w_i = w_1^T \cdot \Sigma \cdot w_i
+\end{equation*}
+
+Este último paso es algo que se sabe y que sale en Wikipedia. Nos lo creemos.
+
+Para resolver un problema de maximización sujeto a algunas condiciones se hace con el método de los multiplicadores de Lagrange.
+
+\subsubsection*{Anexo: método de Lagrange}
+El método de Lagrange sirve para encontrar los extremos (máximos o mínimos) que hay en una función sujeto a algunas condiciones de igualdad. La función puede tener una cantidad arbitraria de parámetros, y se acepta también una cantidad arbitraria de condiciones.
+
+Si tenemos la función $f(x_1,\dots,x_n)$ y las condiciones $g_1(x_1,\dots,x_n) = 0, \dots, g_m(x_1,\dots,x_n) = 0$, definimos nuevas variables $\lambda$ (habrá una por cada condición que haya) y construimas la función de Lagrange:
+
+\begin{equation*}
+  \mathcal{L}(x_1,\dots,x_n,\lambda_1,\dots, \lambda_m) = f(x_1,\dots,x_n) - \sum_{k = 1}^{m} \lambda_kg_k((x_1,\dots,x_n))
+\end{equation*}
+
+En el caso particular de una función de dos parametros $f(x,y)$ y una restricción $g(x,y) = 0$ sería así:
+
+\begin{equation*}
+  \mathcal{L}(x,y,\lambda) = f(x,y) - \lambda g(x,y)
+\end{equation*}
+
+El siguiente paso es derivar $\mathcal{L}$ sobre cada uno de los parámetros (tanto los reales como los añadidos) e igualar todas las ecuaciones a $0$. Eso dará como resultado un sistema de ecuaciones que tendrá tantos resultados como extremos existan cumpliendo todas las condiciones.
+
+Ahora ya únicamente queda mirar todos esos puntos y decidir cuales son máximos o mínimos.
+
+\subsubsection*{Fin del Anexo: método de Lagrange}
+
+Entonces, nuestro problema es maximizar
+\begin{equation*}
+    w_i^T \cdot \Sigma \cdot w_i
+\end{equation*}
+sujeto a que
+\begin{equation*}
+\sum_{j = 1}^d \big( w_{ik}^2 \big) -1 = 0
+\end{equation*}
+
+Construimos la función de Lagrange:
+
+\begin{equation*}
+  \mathcal{L}(w_i,\lambda) = w_i^T \cdot \Sigma \cdot w_i - \lambda \Big( \sum_{j = 1}^d \big( w_{ik}^2 \big) -1\Big)
+\end{equation*}
+
+Y derivamos e igualamos a 0:
+
+(No tengo muy claro cómo se hace esa derivada, pero nos creemos que es así)
+
+\begin{equation*}
+  \frac{\partial \mathcal{L}}{\partial w_i} = 2\Sigma \cdot w_i - 2\lambda w_i = 0
+\end{equation*}
+
+\begin{equation*}
+  \Sigma \cdot w_i = \lambda w_i
+\end{equation*}
+
+La expresión que nos ha quedado se corresponde con la definición de vector y valor propio de una matriz (\textit{eigenvector} y \textit{eigenvalue}). Se dice que $\lambda$ es un valor propio de la matriz $\Sigma$ si existe un vector $w$ tal que:
+
+\begin{equation*}
+  \Sigma \cdot w = \lambda w
+\end{equation*}
+
+Al vector $w$ se le llama vector propio de $\Sigma$
+
+Vemos entonces que los vectores de proyección $w_i$ que estamos buscando se corresponden con los vectores propios de la matriz $\Sigma$.
+
+Pero hemos exigido que los vectores de proyección esten ordenados decrecientemente por varianza, i. e. el primer vector de proyección $w_1$ debe ser el que tenga más varianza en la proyección, el segundo $w_2$, etc.
+
+Veamos cuál será la varianza del vector $w_i$
+
+\begin{equation*}
+  Var(Y_i) = Var(w_i^T \cdot \Sigma) = w_i^T \cdot \Sigma \cdot w_i
+\end{equation*}
+
+Pero hemos visto que
+
+\begin{equation*}
+  \Sigma \cdot w_i = \lambda w_i
+\end{equation*}
+
+Por lo tanto podemos sustituir:
+
+\begin{equation*}
+  w_i^T \cdot \Sigma \cdot w_i = w_i^T \lambda w_i = \lambda w_i^Tw_i
+\end{equation*}
+
+Y como hemos exigido que $w_i^Tw_i = 1$, tenemos que la varianza será $\lambda$
+
+Entonces, el orden en que hemos de cojer los vectores propios es respecto a su valor propio: primero el vector con mayor valor propio, etc.
+
+Pero en realidad también hemos exigido que los vectores de proyección elegidos también sean perpendiculares entre ellos. Para conseguir esto, haremos Lagrange para encontrar únicamente el primero de los vectores de proyección, y luego, para encontrar el segundo hacemos igual pero estableciendo también la condición de que el nuevo vector de proyección sea perpendicular con el primero, i, e: $w_1^Tw_2 = 0$
+
+Cuando tenemos todos los vectores de proyección $w_1,w_2,\dots,w_n$, podemos definir la matriz
+\begin{equation*}
+  A =
+  \begin{bmatrix}
+    w_{11} & w_{21} & \dots & w_{d1} \\
+    w_{12} & w_{22} & \dots & w_{d2} \\
+    \vdots & \vdots & \ddots & \vdots \\
+    w_{1n} & w_{2n} & \dots & w_{dn} \\
+  \end{bmatrix}
+\end{equation*}
+
+Y entonces podemos decir que nuestros nuevos datos son:
+\begin{equation*}
+  Y = A^TX
+\end{equation*}
+
+Ahora es cuando hemos de decidir con cuántos de los componentes principales nos quedamos. Si nos los quedamos todos lo único que habremos hecho será una transformación de los datos.
+
+Si queremos quedarnos con $m$ componentes principales y en total había $d$ ($m \leq d$), entonces
+\begin{equation*}
+  \frac
+  {
+    \sum_{i = 1}^{m} \lambda_i
+  }
+  {
+    \sum_{i = 1}^{d} \lambda_i
+  }
+  \times 100
+\end{equation*}
+
+Es el porcentaje de la varianza con el que nos estamos quedando
+
+\subsection{Fisher Discriminant Analysis (FDA)}
+% TODO
+Queda pendiente para hacer esta sección.
+
+Tiene que ver con hacer otro modelo para reducir la dimensión, dando prioridad a otras cosas

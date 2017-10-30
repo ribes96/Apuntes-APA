@@ -1,752 +1,738 @@
-\documentclass[a4paper,10pt]{article}
-% \documentclass[a6paper]{article}
-\usepackage[utf8]{inputenc}
-\usepackage[spanish]{babel}
-\usepackage{ marvosym }
-\usepackage{amssymb}
-\usepackage{amsmath}
-% \usepackage{listings}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%
-%%Esto es solo una prueba
-%%%%%%%%%%%%%%%%%%%%%%%
-
-
-% \documentclass[a6paper]{article}
-% \usepackage[margin=5mm]{geometry}
-% \usepackage{tgheros}
-% \usepackage[T1]{fontenc}
-% \renewcommand*\familydefault{\sfdefault}
-
-%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-%opening
-\title{Apuntes Tema 1}
-\author{Albert Ribes Marzá}
-
-\begin{document}
-
-\maketitle
-
-\begin{abstract}
-Los apuntes que vaya tomando en clase
-\end{abstract}
-
-\section{}
-\subsection{Introducción a ML}
-\paragraph{Ejemplo 1}
-Se pretende medir la temperatura ($t$) en un punto de una central nuclear, pero la temperatura es tan alta que no se puede medir directamente con ningún sensor. Se intentará deducir la temperatura así:
-\begin{itemize}
-\item $t$ - temperatura a predecir (variable)
-\item $x$ - vector de variables medibles que posiblemente inciden en $t$
-\item $z$ - vector de variables \textbf{NO medibles} que posiblemente inciden en $t$
-\end{itemize}
-
-La relación completa es $ t = \delta(x,z)$, que es una función.
-
-Pero no conocemos $z$ \MVRightarrow Aun conociendo $x$, el valor de $t$ oscila. La relación entre $t$ y $x$ se hace \textit{estocástica}
-
-$p(x,t)$ será la probabilidad de que con esa $x$ se tenga esa temperatura.
-
-Hay que construir una función $t = y(x)$ donde $t$ sea el valor más plausible. El problema es que no conocemos $p$
-
-La forma de atacar el problema será recolectar datos $\{(x_1, t_1),(x_2, t_2), \dots ,(x_n, t_n)\} = D$
-
-$(x_n,t_n) \sim^{i.i.p.} p$ (variables independientes e identicamente distribuidas)
-
-
-El objetivo del \textit{Machine Learning} (ML) es obtener $y$ a partir de $D$. En este caso es un problema de \textit{regresión}
-
-
-
-\paragraph{Ejemplo 2}
-Se tiene una planta de reciclaje, y se quieren clasificar los objetos que van pasando por la cinta. Los datos son:
-\begin{itemize}
-\item $t$ - tipo de producto
-\item $x$ - los atributos de los productos que captamos con una cámara
-\item $z$ - los atributos que no captamos con la cámara
-\end{itemize}
-
-Es el mismo problema de antes, pero ahora $t$ es discreta. Se trata entonces de un problema de \textit{clasificación}.
-
-\subsection{Ejemplo introductorio: el ajuste polinómico}
-
-Tenemos $x \in \mathbb{R}$ y queremos predecir $t \in \mathbb{R}$ (\textit{Regresión})
-
-En todos los problemas nos encontraremos con:
-\begin{itemize}
-\item $x_n \in (0,1)$, $x_n \sim U(0,1) $, (un conjunto de observaciones)
-\item $t_n = sin(2\pi x_n) + \varepsilon, \varepsilon \in N(0,\sigma^2)$, normalmente $\sigma^2 = 0.3^2$, y donde $\varepsilon$ es el ruido aparentemente aleatorio, que proviene de los datos que no conocemos o de errores en la medición.
-\end{itemize}
-
-Vamos a intentar ajustar los datos. Sabemos que si los datos son continuos (no dan saltos) podemos ajustarlos con un polinomio en un intervalo:
-\begin{itemize}
-\item $P_n := \{c_0 + c_1x + c_2x^2 + \dots + c_nx^n\} = \{\sum_{i = 0}^n c_ix^i | c_i \in \mathbb{R} \}$
-\item $C \in \mathbb{R}^{n + 1}$ son todos los parámetros.
-\item Llamamos $y(x;c) = \sum_{i = 0}^{M} c_ix^i$ un modelo
-\item Respecto a $X$, $y$ es una función no lineal
-\item Respecto a $C$, $y$ es una función lineal
-\end{itemize}
-
-Diremos que un modelo es lineal cuando lo es respecto a los parámetros.
-
-Ajustamos $y$ a los datos $\{(x_1,t_1),(x_2,t_2), \dots (x_n, t_n)\}$ definiendo una función de error (la función de error cuadrático):
-
-\begin{equation*}
-E(c) = \frac{1}{2} \sum_{n = 1}^{N} (y(x_n;C) - t_n)^2
-\end{equation*}
-
-Como $E$ depende automáticamente de $C$, derivamos e igualamos a 0 para encontrar el mínimo. Hay que hacer $n$ derivadas, una para cada $c_j$:
-\begin{equation*}
-\frac{\partial E}{\partial c_j} = \frac{1}{2} \sum_{n = 1}^{N} 2(y(x_n;C) - t_n)(x_n)^j
-\end{equation*}
-
-\begin{equation*}
-\frac{\partial E}{\partial c_j} = \sum_{n = 0}^{N} \Big(\sum_{i = 0}^{M} (c_ix_n^i - t_n) \Big) x_n^j = 0
-\end{equation*}
-
-El problema de todo esto es que no sabemos qué grado de polinomio deberíamos usar para reflejar el comportamiento de la variable.
-\begin{itemize}
-\item Si es demasiado pequeño no seremos capaces de ajustar la parte regular $(y)$ de los datos (infra-ajuste)
-\item Si es demasiado grande se ajustará la parte regular $(y)$ y también el ruido (sobre-ajuste)
-\end{itemize}
-
-\subsubsection*{Cómo elegir el grado del polinomio?}
-Únicamente conociendo $E(C)$ no se puede saber. Para hacerlo se usa una muestra alternativa de datos de validación. Esta muestra debería tener más datos.
-
-Si observamos el error producido en nuestros datos con diferentes grados de polinomios, obviamente será más pequeño cuanto más grande sea el polinomio, puesto que tiene más flexibilidad. Pero si miramos qué ocurre con los datos de validación, veremos que al principio el error desciende, pero llega un punto en que empieza a subir. El punto mínimo se corresponde con el grado correcto.
-
-El error empezará a subir porque el sobre-ajuste se ha adaptado a los datos aleatorios, pero en la muestra de validación no tienen por qué ser los mismos, y produce más error.
-
-Si la muestra de validación tiene pocos datos, el mínimo estará poco definido, será más redondeado y más difícil de localizar.
-
-\subsubsection*{Alternativa}
-Pero no siempre es posible tener suficientes datos de validación. Para esto hay una alternativa.
-
-Uno se pregunta: ¿Si un polinomio de grado 9 ``contiene'' a los de grado más pequeño, no podría ocurrir que eligiéramos uno de grado mayor, y que él mismo anulara los coeficientes sobrantes hasta que sea del grado adecuado?
-
-La respuesta es que espontaneamente esto no pasa, puesto que para igualar los datos aleatorios son necesarios coeficientes muy grandes. Si queremos que ocurra tenemos que forzarlo de alguna manera. Para hacerlo, redefiniremos nuestra función de error, de manera que también penalice los coeficientes demasiado grandes. Penalizaremos la norma 2, que equivale a la ``distancia'' pitagórica.
-
-¿Pero cuanto tenemos que penalizarlo? Si nos pasamos o nos quedamos cortos no servirá de nada. Como no sabemos cuanto tenemos que penalizar, usaremos un parámetro $\lambda$ que regulará la penalización que hacemos.
-
-La función de error queda así:
-\begin{equation*}
-E(C) = \frac{1}{2} \sum_{n = 1}^{N} \Big( y(x_n;C) - t_n\Big)^2 + \frac{\lambda}{2}||c||^2
-\end{equation*}
-
-El $\frac{\lambda}{2}$ es simplemente para que al derivar quede más simple. Podría ser solo $\lambda$
-
-\subsection{Conceptos de inferencia estadística}
-
-$D = \{x_1, \dots x_n\}$ es una realización de una variable aleatoria (v.a.) $X_n$ que tiene una función de distribución conocida $p(x_n;\theta), \theta \in \Theta$
-
-Pero esa función de distribución tiene unos parámetros, y nos gustaría saber cuáles usar.
-
-Por ejemplo, si se trata de una distribución normal, sabemos que nuestros datos se corresponden con $N(x, \mu, \sigma^2)$, pero viendo los datos no sabemos qué valores de $\mu$ y $\sigma^2$ deberíamos cojer para que se adaptaran lo más posible a los datos que tenemos.
-
-Vamos a cojer los datos que maximicen nuestra verosimilitud (likelihood), esto es, los que hagan que sea más probable recoger los datos $D$
-
-El objetivo es obtener una estimación $\hat{\theta}$ de $\theta$, dado $D$
-
-La probabilidad de recoger una muestra $x_i$ es $p(x_i,\theta)$
-
-Puesto que sabemos que los datos son i.i.d, la probabilidad de cojer todos los datos $D$ es el producto de cada uno de ellos.
-
-La probabilidad de obtener $D$ es:
-\begin{equation*}
-P_n(D,\theta) = \prod_{n = 1}^{N} p(x_n,\theta)
-\end{equation*}
-
-Definimos la función de verosimilitud (likelihood) así:
-\begin{equation*}
-\mathcal{L} : \theta \rightarrow \mathbb{R}
-\end{equation*}
-
-\begin{equation*}
-\theta \rightarrow \mathcal{L}(\theta) = P_n(D;\theta)
-\end{equation*}
-
-Es decir, es una función que indica cómo de probable es haber recogido los datos $D$ usando los parámetros $\theta$.
-
-Elegiremos los paráetros $\theta$ que maximicen esa probabilidad, los que maximicen $P(D,\theta) = \prod_{n = 1}^{N} p(x_n,\theta)$
-
-El estimador de máxima verosimilitud es $\hat{\theta} = \text{argmax}\  \mathcal{L}(\theta)$, $\theta \in \Theta$
-
-Si es de una sola variable, la forma de hacerlo es derivar e igualar a 0.
-
-Es conveniente operar con el logaritmo de $\alpha$, pues simplifica la maximización de un producto:
-\begin{equation*}
-\ln{(p_1p_2\dots p_n)} = \ln{(p_1)} + \ln{(p_2)} + \dots + \ln{(p_n)}
-\end{equation*}
-
-\subsubsection*{Ejemplo}
-Tenemos un conjunto de datos $D = \{x_1,x_2,\dots, x_n\}$ que siguen una distribución normal $X_n \sim N(x_n,\mu, \sigma^2)$
-
-Se sabe que la función de densidad de la distrubión normal es:
-
-\begin{equation*}
-  N(x, \mu, \sigma^2) = \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x - \mu)^2}{2\sigma^2}}
-\end{equation*}
-
-Entonces la probabilidad de haber cogido los datos $D$ es:
-
-\begin{equation*}
-  P(D, \mu, \sigma^2) = \prod_{i = 1}^{n} \Big( \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x_i - \mu)^2}{2\sigma^2}} \Big)
-\end{equation*}
-
-Pero para hacer los cálculos más sencillos trabajaremos con el logaritmo, que no cambia los máximos relativos. Además, le vamos a cambiar el signo, y ya no buscaremos maximizarlo, sino minimizarlo.
-
-\begin{equation*}
-  l = -\ln(P(D, \mu, \sigma^2)) = -\ln \prod_{i = 1}^{n} \Big( \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x_i - \mu)^2}{2\sigma^2}} \Big) = -\sum_{i = 1}^{N} \ln \big( \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x_i - \mu)^2}{2\sigma^2}} \big)
-\end{equation*}
-
-Se simplifica así:
-
-\begin{equation*}
-  l = -\sum_{i = 1}^{N} \ln \big( \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x_i - \mu)^2}{2\sigma^2}} \big)
-\end{equation*}
-
-\begin{equation*}
-  l = -\sum_{i = 1}^{N} \Big[ \ln \big( \frac{1}{\sigma\sqrt{2\pi}} \big) + \ln \big( e^{-\frac{(x_i - \mu)^2}{2\sigma^2}} \big) \Big]
-\end{equation*}
-
-\begin{equation*}
-  l = -\sum_{i = 1}^{N} \Big[ -\ln \big( \sigma\sqrt{2\pi} \big) - \frac{(x_i - \mu)^2}{2\sigma^2} \Big]
-\end{equation*}
-
-\begin{equation*}
-  l = \sum_{i = 1}^{N} \Big[ \ln \big( \sigma\sqrt{2\pi} \big) + \frac{(x_i - \mu)^2}{2\sigma^2} \Big]
-\end{equation*}
-
-Ahora derivamos respecto de $\mu$ y de $\sigma^2$ e igualamos a 0 para encontrar los extremos:
-
-\begin{equation*}
-\frac{\partial l}{\partial \mu} = \sum_{i = 1}^{N} \Big[ 0 + \frac{1}{2\sigma^2} \cdot 2(x_i - \mu)(-1) \Big]
-\end{equation*}
-
-\begin{equation*}
-\frac{\partial l}{\partial \mu} = \sum_{i = 1}^{N} \Big[ -\frac{x_i - \mu}{\sigma^2} \Big]
-\end{equation*}
-
-\begin{equation*}
-\frac{\partial l}{\partial \mu} = -\frac{1}{\sigma^2}\sum_{i = 1}^{N} \Big[ x_i - \mu \Big] = 0
-\end{equation*}
-
-\begin{equation*}
-\sum_{i = 1}^{N} x_i - \sum_{i = 1}^{N} \mu = 0
-\end{equation*}
-
-\begin{equation*}
-\sum_{i = 1}^{N} x_i - N\mu = 0
-\end{equation*}
-
-\begin{equation*}
-\sum_{i = 1}^{N} x_i = N\mu
-\end{equation*}
-
-\begin{equation*}
-\mu = \frac{1}{N}\sum_{i = 1}^{N} x_i
-\end{equation*}
-
-Y respecto de $\sigma^2$:
-
-\begin{equation*}
-  l = \sum_{i = 1}^{N} \Big[ \ln \big( \sigma\sqrt{2\pi} \big) + \frac{(x_i - \mu)^2}{2\sigma^2} \Big]
-\end{equation*}
-
-\begin{equation*}
-  \frac{\partial l}{\partial \sigma^2} = \sum_{i = 1}^{N} \Big[ \frac{1}{\sigma\sqrt{2\pi}} \cdot \frac{\sqrt{2\pi}}{2\sigma} + \frac{(x_i - \mu)^2}{2} \big( -\frac{1}{\sigma^4} \big) \Big]
-\end{equation*}
-
-\begin{equation*}
-  \frac{\partial l}{\partial \sigma^2} = \sum_{i = 1}^{N} \Big[ \frac{1}{2\sigma^2} - \frac{(x_i - \mu)^2}{2\sigma^4} \Big] = 0
-\end{equation*}
-
-\begin{equation*}
-\sum_{i = 1}^{N} \Big[ \frac{1}{2\sigma^2} \Big] - \sum_{i = 1}^{N} \Big[\frac{(x_i - \mu)^2}{2\sigma^4} \Big] = 0
-\end{equation*}
-
-\begin{equation*}
-\frac{N}{2\sigma^2} = \frac{1}{2\sigma^4}\sum_{i = 1}^{N} (x_i - \mu)^2
-\end{equation*}
-
-\begin{equation*}
-\sigma^2 = \frac{1}{N}\sum_{i = 1}^{N} (x_i - \mu)^2
-\end{equation*}
-
-De este modo hemos encontrado las ecuaciones clásicas para encontrar la media y la varianza muestral, que son la media y varianza más probables teniendo en cuenta los datos que hemos recogido.
-
-Se podría aplicar el mismo procedimiento con alguna otra distribución.
-
-\hspace{1cm}
-
-\textit{Nota: habría que asegurarse que realmente se trata de mínimos mirando la segunda derivada y comprobando que da valores positivos. Se deja como ejercicio}
-
-%1.4
-\subsection{Propiedades de un estimador}
+% \documentclass[a4paper,10pt]{article}
+% \usepackage[utf8]{inputenc}
+% \usepackage[spanish]{babel}
+% \usepackage{ marvosym }
+% \usepackage{amssymb}
+% \usepackage{amsmath}
+
+
+% %opening
+% \title{Apuntes Tema 1}
+% \author{Albert Ribes Marzá}
+%
+% \begin{document}
+%
+% \maketitle
+%
+% \begin{abstract}
+% Los apuntes que vaya tomando en clase
+% \end{abstract}
+
+% \section{}
+% \subsection{Introducción a ML}
+% \paragraph{Ejemplo 1}
+% Se pretende medir la temperatura ($t$) en un punto de una central nuclear, pero la temperatura es tan alta que no se puede medir directamente con ningún sensor. Se intentará deducir la temperatura así:
+% \begin{itemize}
+% \item $t$ - temperatura a predecir (variable)
+% \item $x$ - vector de variables medibles que posiblemente inciden en $t$
+% \item $z$ - vector de variables \textbf{NO medibles} que posiblemente inciden en $t$
+% \end{itemize}
+%
+% La relación completa es $ t = \delta(x,z)$, que es una función.
+%
+% Pero no conocemos $z$ \MVRightarrow Aun conociendo $x$, el valor de $t$ oscila. La relación entre $t$ y $x$ se hace \textit{estocástica}
+%
+% $p(x,t)$ será la probabilidad de que con esa $x$ se tenga esa temperatura.
+%
+% Hay que construir una función $t = y(x)$ donde $t$ sea el valor más plausible. El problema es que no conocemos $p$
+%
+% La forma de atacar el problema será recolectar datos $\{(x_1, t_1),(x_2, t_2), \dots ,(x_n, t_n)\} = D$
+%
+% $(x_n,t_n) \sim^{i.i.p.} p$ (variables independientes e identicamente distribuidas)
+%
+%
+% El objetivo del \textit{Machine Learning} (ML) es obtener $y$ a partir de $D$. En este caso es un problema de \textit{regresión}
+%
+%
+%
+% \paragraph{Ejemplo 2}
+% Se tiene una planta de reciclaje, y se quieren clasificar los objetos que van pasando por la cinta. Los datos son:
+% \begin{itemize}
+% \item $t$ - tipo de producto
+% \item $x$ - los atributos de los productos que captamos con una cámara
+% \item $z$ - los atributos que no captamos con la cámara
+% \end{itemize}
+%
+% Es el mismo problema de antes, pero ahora $t$ es discreta. Se trata entonces de un problema de \textit{clasificación}.
+%
+% \subsection{Ejemplo introductorio: el ajuste polinómico}
+%
+% Tenemos $x \in \mathbb{R}$ y queremos predecir $t \in \mathbb{R}$ (\textit{Regresión})
+%
+% En todos los problemas nos encontraremos con:
+% \begin{itemize}
+% \item $x_n \in (0,1)$, $x_n \sim U(0,1) $, (un conjunto de observaciones)
+% \item $t_n = sin(2\pi x_n) + \varepsilon, \varepsilon \in N(0,\sigma^2)$, normalmente $\sigma^2 = 0.3^2$, y donde $\varepsilon$ es el ruido aparentemente aleatorio, que proviene de los datos que no conocemos o de errores en la medición.
+% \end{itemize}
+%
+% Vamos a intentar ajustar los datos. Sabemos que si los datos son continuos (no dan saltos) podemos ajustarlos con un polinomio en un intervalo:
+% \begin{itemize}
+% \item $P_n := \{c_0 + c_1x + c_2x^2 + \dots + c_nx^n\} = \{\sum_{i = 0}^n c_ix^i | c_i \in \mathbb{R} \}$
+% \item $C \in \mathbb{R}^{n + 1}$ son todos los parámetros.
+% \item Llamamos $y(x;c) = \sum_{i = 0}^{M} c_ix^i$ un modelo
+% \item Respecto a $X$, $y$ es una función no lineal
+% \item Respecto a $C$, $y$ es una función lineal
+% \end{itemize}
+%
+% Diremos que un modelo es lineal cuando lo es respecto a los parámetros.
+%
+% Ajustamos $y$ a los datos $\{(x_1,t_1),(x_2,t_2), \dots (x_n, t_n)\}$ definiendo una función de error (la función de error cuadrático):
+%
+% \begin{equation*}
+% E(c) = \frac{1}{2} \sum_{n = 1}^{N} (y(x_n;C) - t_n)^2
+% \end{equation*}
+%
+% Como $E$ depende automáticamente de $C$, derivamos e igualamos a 0 para encontrar el mínimo. Hay que hacer $n$ derivadas, una para cada $c_j$:
+% \begin{equation*}
+% \frac{\partial E}{\partial c_j} = \frac{1}{2} \sum_{n = 1}^{N} 2(y(x_n;C) - t_n)(x_n)^j
+% \end{equation*}
+%
+% \begin{equation*}
+% \frac{\partial E}{\partial c_j} = \sum_{n = 0}^{N} \Big(\sum_{i = 0}^{M} (c_ix_n^i - t_n) \Big) x_n^j = 0
+% \end{equation*}
+%
+% El problema de todo esto es que no sabemos qué grado de polinomio deberíamos usar para reflejar el comportamiento de la variable.
+% \begin{itemize}
+% \item Si es demasiado pequeño no seremos capaces de ajustar la parte regular $(y)$ de los datos (infra-ajuste)
+% \item Si es demasiado grande se ajustará la parte regular $(y)$ y también el ruido (sobre-ajuste)
+% \end{itemize}
+%
+% \subsubsection*{Cómo elegir el grado del polinomio?}
+% Únicamente conociendo $E(C)$ no se puede saber. Para hacerlo se usa una muestra alternativa de datos de validación. Esta muestra debería tener más datos.
+%
+% Si observamos el error producido en nuestros datos con diferentes grados de polinomios, obviamente será más pequeño cuanto más grande sea el polinomio, puesto que tiene más flexibilidad. Pero si miramos qué ocurre con los datos de validación, veremos que al principio el error desciende, pero llega un punto en que empieza a subir. El punto mínimo se corresponde con el grado correcto.
+%
+% El error empezará a subir porque el sobre-ajuste se ha adaptado a los datos aleatorios, pero en la muestra de validación no tienen por qué ser los mismos, y produce más error.
+%
+% Si la muestra de validación tiene pocos datos, el mínimo estará poco definido, será más redondeado y más difícil de localizar.
+%
+% \subsubsection*{Alternativa}
+% Pero no siempre es posible tener suficientes datos de validación. Para esto hay una alternativa.
+%
+% Uno se pregunta: ¿Si un polinomio de grado 9 ``contiene'' a los de grado más pequeño, no podría ocurrir que eligiéramos uno de grado mayor, y que él mismo anulara los coeficientes sobrantes hasta que sea del grado adecuado?
+%
+% La respuesta es que espontaneamente esto no pasa, puesto que para igualar los datos aleatorios son necesarios coeficientes muy grandes. Si queremos que ocurra tenemos que forzarlo de alguna manera. Para hacerlo, redefiniremos nuestra función de error, de manera que también penalice los coeficientes demasiado grandes. Penalizaremos la norma 2, que equivale a la ``distancia'' pitagórica.
+%
+% ¿Pero cuanto tenemos que penalizarlo? Si nos pasamos o nos quedamos cortos no servirá de nada. Como no sabemos cuanto tenemos que penalizar, usaremos un parámetro $\lambda$ que regulará la penalización que hacemos.
+%
+% La función de error queda así:
+% \begin{equation*}
+% E(C) = \frac{1}{2} \sum_{n = 1}^{N} \Big( y(x_n;C) - t_n\Big)^2 + \frac{\lambda}{2}||c||^2
+% \end{equation*}
+%
+% El $\frac{\lambda}{2}$ es simplemente para que al derivar quede más simple. Podría ser solo $\lambda$
+%
+% \subsection{Conceptos de inferencia estadística}
+%
+% $D = \{x_1, \dots x_n\}$ es una realización de una variable aleatoria (v.a.) $X_n$ que tiene una función de distribución conocida $p(x_n;\theta), \theta \in \Theta$
+%
+% Pero esa función de distribución tiene unos parámetros, y nos gustaría saber cuáles usar.
+%
+% Por ejemplo, si se trata de una distribución normal, sabemos que nuestros datos se corresponden con $N(x, \mu, \sigma^2)$, pero viendo los datos no sabemos qué valores de $\mu$ y $\sigma^2$ deberíamos cojer para que se adaptaran lo más posible a los datos que tenemos.
+%
+% Vamos a cojer los datos que maximicen nuestra verosimilitud (likelihood), esto es, los que hagan que sea más probable recoger los datos $D$
+%
+% El objetivo es obtener una estimación $\hat{\theta}$ de $\theta$, dado $D$
+%
+% La probabilidad de recoger una muestra $x_i$ es $p(x_i,\theta)$
+%
+% Puesto que sabemos que los datos son i.i.d, la probabilidad de cojer todos los datos $D$ es el producto de cada uno de ellos.
+%
+% La probabilidad de obtener $D$ es:
+% \begin{equation*}
+% P_n(D,\theta) = \prod_{n = 1}^{N} p(x_n,\theta)
+% \end{equation*}
+%
+% Definimos la función de verosimilitud (likelihood) así:
+% \begin{equation*}
+% \mathcal{L} : \theta \rightarrow \mathbb{R}
+% \end{equation*}
+%
+% \begin{equation*}
+% \theta \rightarrow \mathcal{L}(\theta) = P_n(D;\theta)
+% \end{equation*}
+%
+% Es decir, es una función que indica cómo de probable es haber recogido los datos $D$ usando los parámetros $\theta$.
+%
+% Elegiremos los paráetros $\theta$ que maximicen esa probabilidad, los que maximicen $P(D,\theta) = \prod_{n = 1}^{N} p(x_n,\theta)$
+%
+% El estimador de máxima verosimilitud es $\hat{\theta} = \text{argmax}\  \mathcal{L}(\theta)$, $\theta \in \Theta$
+%
+% Si es de una sola variable, la forma de hacerlo es derivar e igualar a 0.
+%
+% Es conveniente operar con el logaritmo de $\alpha$, pues simplifica la maximización de un producto:
+% \begin{equation*}
+% \ln{(p_1p_2\dots p_n)} = \ln{(p_1)} + \ln{(p_2)} + \dots + \ln{(p_n)}
+% \end{equation*}
+%
+% \subsubsection*{Ejemplo}
+% Tenemos un conjunto de datos $D = \{x_1,x_2,\dots, x_n\}$ que siguen una distribución normal $X_n \sim N(x_n,\mu, \sigma^2)$
+%
+% Se sabe que la función de densidad de la distrubión normal es:
+%
+% \begin{equation*}
+%   N(x, \mu, \sigma^2) = \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x - \mu)^2}{2\sigma^2}}
+% \end{equation*}
+%
+% Entonces la probabilidad de haber cogido los datos $D$ es:
+%
+% \begin{equation*}
+%   P(D, \mu, \sigma^2) = \prod_{i = 1}^{n} \Big( \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x_i - \mu)^2}{2\sigma^2}} \Big)
+% \end{equation*}
+%
+% Pero para hacer los cálculos más sencillos trabajaremos con el logaritmo, que no cambia los máximos relativos. Además, le vamos a cambiar el signo, y ya no buscaremos maximizarlo, sino minimizarlo.
+%
+% \begin{equation*}
+%   l = -\ln(P(D, \mu, \sigma^2)) = -\ln \prod_{i = 1}^{n} \Big( \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x_i - \mu)^2}{2\sigma^2}} \Big) = -\sum_{i = 1}^{N} \ln \big( \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x_i - \mu)^2}{2\sigma^2}} \big)
+% \end{equation*}
+%
+% Se simplifica así:
+%
+% \begin{equation*}
+%   l = -\sum_{i = 1}^{N} \ln \big( \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x_i - \mu)^2}{2\sigma^2}} \big)
+% \end{equation*}
+%
+% \begin{equation*}
+%   l = -\sum_{i = 1}^{N} \Big[ \ln \big( \frac{1}{\sigma\sqrt{2\pi}} \big) + \ln \big( e^{-\frac{(x_i - \mu)^2}{2\sigma^2}} \big) \Big]
+% \end{equation*}
+%
+% \begin{equation*}
+%   l = -\sum_{i = 1}^{N} \Big[ -\ln \big( \sigma\sqrt{2\pi} \big) - \frac{(x_i - \mu)^2}{2\sigma^2} \Big]
+% \end{equation*}
+%
+% \begin{equation*}
+%   l = \sum_{i = 1}^{N} \Big[ \ln \big( \sigma\sqrt{2\pi} \big) + \frac{(x_i - \mu)^2}{2\sigma^2} \Big]
+% \end{equation*}
+%
+% Ahora derivamos respecto de $\mu$ y de $\sigma^2$ e igualamos a 0 para encontrar los extremos:
+%
+% \begin{equation*}
+% \frac{\partial l}{\partial \mu} = \sum_{i = 1}^{N} \Big[ 0 + \frac{1}{2\sigma^2} \cdot 2(x_i - \mu)(-1) \Big]
+% \end{equation*}
+%
+% \begin{equation*}
+% \frac{\partial l}{\partial \mu} = \sum_{i = 1}^{N} \Big[ -\frac{x_i - \mu}{\sigma^2} \Big]
+% \end{equation*}
+%
+% \begin{equation*}
+% \frac{\partial l}{\partial \mu} = -\frac{1}{\sigma^2}\sum_{i = 1}^{N} \Big[ x_i - \mu \Big] = 0
+% \end{equation*}
+%
+% \begin{equation*}
+% \sum_{i = 1}^{N} x_i - \sum_{i = 1}^{N} \mu = 0
+% \end{equation*}
+%
+% \begin{equation*}
+% \sum_{i = 1}^{N} x_i - N\mu = 0
+% \end{equation*}
+%
+% \begin{equation*}
+% \sum_{i = 1}^{N} x_i = N\mu
+% \end{equation*}
+%
+% \begin{equation*}
+% \mu = \frac{1}{N}\sum_{i = 1}^{N} x_i
+% \end{equation*}
+%
+% Y respecto de $\sigma^2$:
+%
+% \begin{equation*}
+%   l = \sum_{i = 1}^{N} \Big[ \ln \big( \sigma\sqrt{2\pi} \big) + \frac{(x_i - \mu)^2}{2\sigma^2} \Big]
+% \end{equation*}
+%
+% \begin{equation*}
+%   \frac{\partial l}{\partial \sigma^2} = \sum_{i = 1}^{N} \Big[ \frac{1}{\sigma\sqrt{2\pi}} \cdot \frac{\sqrt{2\pi}}{2\sigma} + \frac{(x_i - \mu)^2}{2} \big( -\frac{1}{\sigma^4} \big) \Big]
+% \end{equation*}
+%
+% \begin{equation*}
+%   \frac{\partial l}{\partial \sigma^2} = \sum_{i = 1}^{N} \Big[ \frac{1}{2\sigma^2} - \frac{(x_i - \mu)^2}{2\sigma^4} \Big] = 0
+% \end{equation*}
+%
+% \begin{equation*}
+% \sum_{i = 1}^{N} \Big[ \frac{1}{2\sigma^2} \Big] - \sum_{i = 1}^{N} \Big[\frac{(x_i - \mu)^2}{2\sigma^4} \Big] = 0
+% \end{equation*}
+%
+% \begin{equation*}
+% \frac{N}{2\sigma^2} = \frac{1}{2\sigma^4}\sum_{i = 1}^{N} (x_i - \mu)^2
+% \end{equation*}
+%
+% \begin{equation*}
+% \sigma^2 = \frac{1}{N}\sum_{i = 1}^{N} (x_i - \mu)^2
+% \end{equation*}
+%
+% De este modo hemos encontrado las ecuaciones clásicas para encontrar la media y la varianza muestral, que son la media y varianza más probables teniendo en cuenta los datos que hemos recogido.
+%
+% Se podría aplicar el mismo procedimiento con alguna otra distribución.
+%
+% \hspace{1cm}
+%
+% \textit{Nota: habría que asegurarse que realmente se trata de mínimos mirando la segunda derivada y comprobando que da valores positivos. Se deja como ejercicio}
+%
+% %1.4
+% \subsection{Propiedades de un estimador}
 
 
 
 
 %2
-\section{Reducción de dimensión}
-Para hacer \textit{Machine Learning} es interesante tener los datos lo más simplificados posible, pues eso evita el sobre-ajuste. Existen muchos métodos para reducir la dimensión de un problema. Reducir la dimensión se podría entender como quedarse con una sombra de la imagen real que tenemos. Esto es: si todos los datos que tenemos estuvieran en 3 dimensiones, podría interesarnos trabajar con la sombra que proyectan esos datos, de manera que trabajaríamos con solo 2 dimensiones.
-
-Pues hacemos los mismo, pero con muchas dimensiones.
-
-Las ventajas que tiene esto son que evita el sobre-ajuste, nos permite entender mejor los datos y que son más fáciles de representar, con plots o dibujos.
-
-Pero hay que cojer una buena proyección de los datos reales. Puesto que está claro que vamos perder información (datos, en realidad), cojeremos una proyección que refleje lo que nos interesa, y que deseche otras cosas.
-
-Es por eso que hay muchas formas de reducir la dimensión de un conjunto de datos, cada una según la prioridad que uno tenga, y cogiendo las proyecciones más adecuadas para cada necesidad.
-
-Ahora veremos algunas de las formas de reducir la dimensión:
-\subsection{Principal Components Analisis (PCA)}
-Este algoritmo tiene como prioridad preservar la varianza de los datos, maximizar la dispersión en las proyecciones.
-
-Esto es, en la analogía de la sombra, cojer la sombra que tenga más area.
-
-De forma más técnica:
-
-Tenemos una muestra de datos $\{X_1,X_2,\dots, X_n\}, X_i \in \mathbb{R}^d$ que provienen de un vector aleatorio $X = \{X_1,\dots,X_n\}^T$. Cada una de las $X_i$ es una variable (aleatoria?) y tenemos $d$ muestras en cada una de las variables.
-
-Disponemos también de la matriz de covarianzas $\Sigma$.
-
-La matriz de covarianzas es una matriz de $n \times n$ donde $\Sigma_{ij}$ es $\text{var(}X_i,X_j\text{)}$ si $i \neq j$ y $\Sigma_{ii}$ es $\sigma_i^2$
-
-Tenemos datos en $n$ dimensiones, y decidimos que queremos únicamente $k$ dimensiones, $k < n$, y no cualesquiera dimensiones, sino las que maximicen la varianza.
-
-Hemos de encontrar entonces $k$ vectores $n$-dimensionales. Encontraremos $n$ vectores que serán todos ``perpendiculares'' entre ellos y cojeremos los $k$ vectores que tengan más varianza.
-
-Nuestro objetivo entonces obtener un nuevo sistema de coordenadas $Y = (Y_1,\dots,Y_n)$ que cumpla estas condiciones:
-\begin{enumerate}
-  \item Covar($Y_i,Y_j$) $ = 0$ si $i \neq j$
-  \item Var($Y_1$) $>$ Var($Y_2$) $> \dots > $ Var($Y_n$) (de hecho los ordenaremos decrecientemente)
-  \item $\sum_{i = 1}^{d} Var(X_i) = \sum_{i = 1}^{d} Var(Y_i)$
-\end{enumerate}
-
-Encontraremos la proyección $Y_i$ encontrando un vector $w_i$ que cumpla que $Y_i = w_i^T \cdot X$
-
-Como hay muchos vectores que cumplen esa condición (vectores que tienen todos la misma dirección, pero distinto módulo) establecemos la condición sobre $w_i$ de que la norma 2 al cuadrado sea 1, esto es: $||w_i||_2^2 = 1 \Rightarrow w_{i1}^2 + w_{i2}^2 + \dots + w_{in}^2 = 1$
-
-Objetivo: $w_1$ ha de maximizar la varianza de $Y_i$, sujeto a que $||w_i|| = 1$
-
-\begin{equation*}
-  Var(Y_i) = Var(w_i^T \cdot X) = w_1^T \cdot Var(X) \cdot w_i = w_1^T \cdot \Sigma \cdot w_i
-\end{equation*}
-
-Este último paso es algo que se sabe y que sale en Wikipedia. Nos lo creemos.
-
-Para resolver un problema de maximización sujeto a algunas condiciones se hace con el método de los multiplicadores de Lagrange.
-
-\subsubsection*{Anexo: método de Lagrange}
-El método de Lagrange sirve para encontrar los extremos (máximos o mínimos) que hay en una función sujeto a algunas condiciones de igualdad. La función puede tener una cantidad arbitraria de parámetros, y se acepta también una cantidad arbitraria de condiciones.
-
-Si tenemos la función $f(x_1,\dots,x_n)$ y las condiciones $g_1(x_1,\dots,x_n) = 0, \dots, g_m(x_1,\dots,x_n) = 0$, definimos nuevas variables $\lambda$ (habrá una por cada condición que haya) y construimas la función de Lagrange:
-
-\begin{equation*}
-  \mathcal{L}(x_1,\dots,x_n,\lambda_1,\dots, \lambda_m) = f(x_1,\dots,x_n) - \sum_{k = 1}^{m} \lambda_kg_k((x_1,\dots,x_n))
-\end{equation*}
-
-En el caso particular de una función de dos parametros $f(x,y)$ y una restricción $g(x,y) = 0$ sería así:
-
-\begin{equation*}
-  \mathcal{L}(x,y,\lambda) = f(x,y) - \lambda g(x,y)
-\end{equation*}
-
-El siguiente paso es derivar $\mathcal{L}$ sobre cada uno de los parámetros (tanto los reales como los añadidos) e igualar todas las ecuaciones a $0$. Eso dará como resultado un sistema de ecuaciones que tendrá tantos resultados como extremos existan cumpliendo todas las condiciones.
-
-Ahora ya únicamente queda mirar todos esos puntos y decidir cuales son máximos o mínimos.
-
-\subsubsection*{Fin del Anexo: método de Lagrange}
-
-Entonces, nuestro problema es maximizar
-\begin{equation*}
-    w_i^T \cdot \Sigma \cdot w_i
-\end{equation*}
-sujeto a que
-\begin{equation*}
-\sum_{j = 1}^d \big( w_{ik}^2 \big) -1 = 0
-\end{equation*}
-
-Construimos la función de Lagrange:
-
-\begin{equation*}
-  \mathcal{L}(w_i,\lambda) = w_i^T \cdot \Sigma \cdot w_i - \lambda \Big( \sum_{j = 1}^d \big( w_{ik}^2 \big) -1\Big)
-\end{equation*}
-
-Y derivamos e igualamos a 0:
-
-(No tengo muy claro cómo se hace esa derivada, pero nos creemos que es así)
-
-\begin{equation*}
-  \frac{\partial \mathcal{L}}{\partial w_i} = 2\Sigma \cdot w_i - 2\lambda w_i = 0
-\end{equation*}
-
-\begin{equation*}
-  \Sigma \cdot w_i = \lambda w_i
-\end{equation*}
-
-La expresión que nos ha quedado se corresponde con la definición de vector y valor propio de una matriz (\textit{eigenvector} y \textit{eigenvalue}). Se dice que $\lambda$ es un valor propio de la matriz $\Sigma$ si existe un vector $w$ tal que:
-
-\begin{equation*}
-  \Sigma \cdot w = \lambda w
-\end{equation*}
-
-Al vector $w$ se le llama vector propio de $\Sigma$
-
-Vemos entonces que los vectores de proyección $w_i$ que estamos buscando se corresponden con los vectores propios de la matriz $\Sigma$.
-
-Pero hemos exigido que los vectores de proyección esten ordenados decrecientemente por varianza, i. e. el primer vector de proyección $w_1$ debe ser el que tenga más varianza en la proyección, el segundo $w_2$, etc.
-
-Veamos cuál será la varianza del vector $w_i$
-
-\begin{equation*}
-  Var(Y_i) = Var(w_i^T \cdot \Sigma) = w_i^T \cdot \Sigma \cdot w_i
-\end{equation*}
-
-Pero hemos visto que
-
-\begin{equation*}
-  \Sigma \cdot w_i = \lambda w_i
-\end{equation*}
-
-Por lo tanto podemos sustituir:
-
-\begin{equation*}
-  w_i^T \cdot \Sigma \cdot w_i = w_i^T \lambda w_i = \lambda w_i^Tw_i
-\end{equation*}
-
-Y como hemos exigido que $w_i^Tw_i = 1$, tenemos que la varianza será $\lambda$
-
-Entonces, el orden en que hemos de cojer los vectores propios es respecto a su valor propio: primero el vector con mayor valor propio, etc.
-
-Pero en realidad también hemos exigido que los vectores de proyección elegidos también sean perpendiculares entre ellos. Para conseguir esto, haremos Lagrange para encontrar únicamente el primero de los vectores de proyección, y luego, para encontrar el segundo hacemos igual pero estableciendo también la condición de que el nuevo vector de proyección sea perpendicular con el primero, i, e: $w_1^Tw_2 = 0$
-
-Cuando tenemos todos los vectores de proyección $w_1,w_2,\dots,w_n$, podemos definir la matriz
-\begin{equation*}
-  A =
-  \begin{bmatrix}
-    w_{11} & w_{21} & \dots & w_{d1} \\
-    w_{12} & w_{22} & \dots & w_{d2} \\
-    \vdots & \vdots & \ddots & \vdots \\
-    w_{1n} & w_{2n} & \dots & w_{dn} \\
-  \end{bmatrix}
-\end{equation*}
-
-Y entonces podemos decir que nuestros nuevos datos son:
-\begin{equation*}
-  Y = A^TX
-\end{equation*}
-
-Ahora es cuando hemos de decidir con cuántos de los componentes principales nos quedamos. Si nos los quedamos todos lo único que habremos hecho será una transformación de los datos.
-
-Si queremos quedarnos con $m$ componentes principales y en total había $d$ ($m \leq d$), entonces
-\begin{equation*}
-  \frac
-  {
-    \sum_{i = 1}^{m} \lambda_i
-  }
-  {
-    \sum_{i = 1}^{d} \lambda_i
-  }
-  \times 100
-\end{equation*}
-
-Es el porcentaje de la varianza con el que nos estamos quedando
-
-\subsection{Fisher Discriminant Analysis (FDA)}
-% TODO
-Queda pendiente para hacer esta sección.
-
-Tiene que ver con hacer otro modelo para reducir la dimensión, dando prioridad a otras cosas
-
-\section{Clustering}
-Clustering quiere decir agrupar. Un algoritmo de clustering recibe como entrada un conjunto de datos, y él clasifica esos datos en varios grupos, en varios clusters, en función de algún parámetro.
-
-Normalmente la cantidad de clusters es arbitraria, decidida por factores ajenos al problema. De hecho es un problema complicado decidir cuál es la cantidad adecuada de clusters, y existen algunos algoritmos que intentan calcularla, pero son poco genéricos.
-
-Para los algoritmos que trataremos aquí supondremos que la cantidad de clusters ya viene dada. Se tratará de encontrar ``dónde están'' esos clusters y ver qué elementos pertenecen a cada uno de los clusters. Como veremos, la mayoría de problemas problemas de optimización de clustering son NP-completos, y por eso buscaremos una buena solución en vez de la mejor solución.
-
-\subsection{Algoritmo de K-means}
-Disponemos de un conjunto de datos $D = \{x_1, x_2, \dots, x_n\}, x_i \in \mathbb{R}^d$ y queremos encontrar $K$ prototipos (centroides) $P = \{\mu_1, \mu_2, \dots, \mu_K\}, \mu_i \in \mathbb{R}^d$ a los que asociar los datos $D$
-
-El criterio será minimizar la suma de distancias de cada dato $x_i$ a su cluster más cercano, que será el cluster al que esté asignado.
-
-Definimos una variable binaria $\pi_{ik}$:
-
-\begin{equation*}
-\pi_{ik} =
-\begin{cases}
-1 & \text{ si el dato $x_i$ está asignado al cluster $k$} \\
-0  & \text{ otherwise}
-\end{cases}
-\end{equation*}
-
-Formalmente el criterio a minimizar será:
-
-\begin{equation*}
-J = \sum_{i = 1}^{N} \sum_{k = 1}^{K} \pi_{ik} ||x_i - \mu_k||^2
-\end{equation*}
-
-Está demostrado que dado un conjunto de datos, encontrar la ``posición'' de $K$ clústers y la asignación de datos a clusters de la manera más optima es un problema NP-completo, de modo que para resolver esto vamos a tener un problema.
-
-Sin embargo, resolver la mitad del problema es fácil: si te dicen a priori la ``posición'' de cada uno de los clusters, es fácil ver qué datos hay que asignar a cada cluster. Si por el contrario te dicen qué datos irán asignados al mismo cluster, es fácil encontrar la posición de cada uno de los clusters.
-
-Entonces para resolver este problema, partiremos de una de las mitades del problema, que se habrá encontrado arbitrariamente, y entonces se buscará la otra mitad más óptima. A continuación se recalculará la primera mitad en función de estos datos, y este proceso se repetirá hasta que ya no se mejore más.
-
-De esta manera terminamos teniendo un máximo local, pero no absoluto. La calidad de la solución dependerá de los datos iniciales. Se han hecho muchos estudios sobre qué datos iniciales son más adecuados, pero al final parece que lo mejor es usar datos aleatorios de entre el conjunto de datos $D$.
-
-Este algoritmo es extremadamente rápido, por lo que normalmente se ejecuta varias veces con datos iniciales distintos y se mantiene el que da mejores resultados.
-
-% TODO hacer la demostración para ver que el método intuitivo para encontrar la segunda mitad dada la primera es realmente la mejor forma de hacerlo. Es bastante sencillo.
-
-Ahora faltaría ver cómo se encuentra la segunda mitad. Queda para más adelante.
-
-\subsection{Mezcla de Gaussianas (Mixture of Gaussians MoG)}
-
-El método de K-means tiene el problema de que es binario: un dato pertenece a un cluster o no pertenece, y solamente pertenece a uno. Dos datos que estén muy ``cerca'' pueden quedar en dos clusters distintos a pesar de que sean muy parecidos.
-
-Otra forma de verlo es que un dato pertenezca a un cluster con una cierta probabilidad. Para ello habría que definir una función de distribución que reflejara la asignación de datos a los distintos clústers. El problema es que una distribución simple (como la normal o la binomial) no tiene la capacidad para reflejar cualquier cantidad de datos y clusters. Por ello vamos a usar la Mezcla de Gaussianas. Esto no es más que asignar una distribución gaussiana (o normal) a cada uno de los clusters, y hacer la suma. De este modo con una cantidad suficiente de distribuciones normales podemos representar cualquier función de probabilidad.
-
-Formalizamos el problema.
-
-Tenemos un conjunto de datos $D = \{x_1, x_2, \dots, x_n\}, x_i \in \mathbb{R}^d$ y queremos definir $K$ clusters. Diremos que $\pi_k$ es la probabilidad que el cluster $k$ genere un dato cualquiera. Deberá cumplirse que $\sum_{k = 1}^K \pi_k = 1$
-
-Entonces la probabilidad de que el dato $x$ sea generado es:
-
-\begin{equation*}
-p(x) = \sum_{k = 1}^{K} \pi_k \cdot \mathcal{N}(x; \mu_k, \Sigma_k)
-\end{equation*}
-
-Si queremos generar datos siguiendo una MoG, lo primero que hay que hacer es elegir qué componente generará el dato, según la probabilidad que tengan ($\pi_k$) y después generar un dato siguiendo la distribución normal que esta define, como ya se ha hecho siempre.
-
-Para simplificar la notación a partir de ahora, supondremos la existencia de un vector $z$ que indicará componentes principales. Se trata de un vector binario de $K$ elementos en el que todos los elementos son $0$ excepto uno, que tiene un $1$ y que indica de qué componente se trata.
-
-Entonces diremos que:
-\begin{equation*}
-p(z_k = 1) = \pi_k
-\end{equation*}
-
-\begin{equation*}
-p(z) = \prod_{k = 1}^{K} \pi_k^{z_k}
-\end{equation*}
-
-De hecho, se puede entender como $p(z) = \pi_1 \cdot \pi_2 \cdot \dots \cdot \pi_K$
-
-De la misma manera podemos decir que:
-
-\begin{equation*}
-p(x | z_k = 1) = \mathcal{N}(x; \mu_k, \Sigma_k)
-\end{equation*}
-
-\begin{equation*}
-p(x | z) = \sum_{k = 1}^{K} z_k \cdot \mathcal{N}(x; \mu_k, \Sigma_k) \text{(La misma que antes hemos definido como p(x))}
-\end{equation*}
-
-
-
-% TODO me estoy dejando una parte aquí
-
-Ahora vendrían más cosas, pero sigo con otro tema
-
-\section{Modelos lineales de regresión}
-Lo que se vió en el tema 1 sobre el ajuste polinómico no es más que un caso concreto de los modelos lineales de regresión,
-en el que las funciones de base eran obligatoriamente exponenciales.
-
-Ahora vamos a ver el caso genérico.
-
-\subsection{Introducción al concepto de función de base (Basis Function, BF)}
-Si tenemos datos $x \in \mathbb{R}^d$, y queremos predecir un dato $t$, igual que con el ajuste polinómico, definimos una colección de funciones $\phi_j: \mathbb{R}^d \rightarrow \mathbb{R}$ para definir el siguiente modelo:
-
-% Entonces podemos definir un modelo como:
-
-\begin{equation*}
-y(x,w) = \phi_0(x) + \sum_{j = 1}^{n-1} w_j\phi_j(x),
-\end{equation*}
-
-El caso del ajuste polinómico es cuando se establece la condición de que $\phi_j(x) = x^j$. Ahora podemos usar un conjunto
-más grande de funciones de base, incluídos los senos y cosenos.
-
-\subsection{El método de mínimos cuadrados}
-Como siempre, consideraremos:
-
-\begin{equation*}
-t = f(x) + \epsilon, \epsilon \sim \mathcal{N}(0, \sigma^2)
-\end{equation*}
-
-Es decir, que los datos de salida dependen de los datos que podemos medir ($x$) y de datos que no podemos pedir ($\epsilon$), que consideraremos ruido, y trabajaremos con la asunción de que ese ruido sigue una distribución normal centrada en $0$ y con varianza $\sigma^2$.
-
-Entonces definiremos:
-
-\begin{equation*}
-p(t | x, w, \sigma^2) = \mathcal{N}(t; y(x,w), \sigma^2)
-\end{equation*}
-
-Esto es, la probabilidad de que la salida sea $t$ asumiendo los datos $x, w, \sigma^2$.
-
-Abordamos el problema de decidir qué parámetros $w \in \mathbb{R}^M$ y $\sigma^2 \in \mathbb{R}$ deberíamos elegir para modelar los más acertadamente posible un conjunto de datos $D = \{x_1, x_2, \dots, x_n\}, x_i \in \mathbb{R}^d$ (que son i.i.d)
-que da como resultado $t \in \mathbb{R}^N$
-
-Igual que en ajuste polinómico, todavía no sabemos qué cantidad de funciones de base deberíamos usar. De momento, definimos que usaremos $M$ funciones de base.
-
-Se usará para los siguientes cálculos la notación matricial, que deja implícitos muchos cálculos. Para que se entienda bien, se definen los siguientes datos:
-
-
-\begin{equation*}
-X =
-\begin{bmatrix}
-\leftarrow & x_1 & \rightarrow \\
-\leftarrow & x_2 & \rightarrow \\
-\vdots \\
-\leftarrow & x_n & \rightarrow \\
-\end{bmatrix}
-=
-\begin{bmatrix}
-x_{11} & x_{12} & \dots & x_{1d} \\
-x_{21} & x_{22} & \dots & x_{2d} \\
-\vdots & \vdots & \ddots & \vdots \\
-x_{n1} & x_{n2} & \dots & x_{nd}
-\end{bmatrix}
-\end{equation*}
-
-
-
-\begin{equation*}
-t =
-\begin{bmatrix}
-t_1 \\
-t_2 \\
-\vdots \\
-t_n
-\end{bmatrix}
-\end{equation*}
-
-\begin{equation*}
-\phi =
-\begin{bmatrix}
-\phi_1 \\
-\phi_2 \\
-\vdots \\
-\phi_M
-\end{bmatrix}
-\end{equation*}
-
-
-
-\begin{equation*}
-\Phi =
-\begin{bmatrix}
-\phi_0(x_1) & \phi_1(x_1) & \dots & \phi_{M-1}(x_1) \\
-\phi_0(x_2) & \phi_1(x_2) & \dots & \phi_{M-1}(x_2) \\
-\vdots & \vdots & \ddots & \vdots \\
-\phi_0(x_n) & \phi_1(x_n) & \dots & \phi_{M-1}(x_n) \\
-\end{bmatrix}
-\end{equation*}
-
-Sacamos entonces la función de verosimilitud que ofrecen los parámetros $\theta = (w, \sigma^2)$ usando el logaritmo negado de la probabilidad de obtener los datos $t$ mediante los datos $X$. Esta función es la que habrá que maximizar.
-
-\begin{align*}
--l(\theta) = \\
--l(w, \sigma^2) =\\
+% \section{Reducción de dimensión}
+% Para hacer \textit{Machine Learning} es interesante tener los datos lo más simplificados posible, pues eso evita el sobre-ajuste. Existen muchos métodos para reducir la dimensión de un problema. Reducir la dimensión se podría entender como quedarse con una sombra de la imagen real que tenemos. Esto es: si todos los datos que tenemos estuvieran en 3 dimensiones, podría interesarnos trabajar con la sombra que proyectan esos datos, de manera que trabajaríamos con solo 2 dimensiones.
 %
--\ln P(t | X, w, \sigma^2) = \\
+% Pues hacemos los mismo, pero con muchas dimensiones.
 %
--\ln \prod_{i}^{N} p(t_i | X_i, w, \sigma^2) = \\
+% Las ventajas que tiene esto son que evita el sobre-ajuste, nos permite entender mejor los datos y que son más fáciles de representar, con plots o dibujos.
 %
--\ln \prod_{i = 1}^{N} \mathcal{N}(t_i; y(x_i, w), \sigma^2) = \\
+% Pero hay que cojer una buena proyección de los datos reales. Puesto que está claro que vamos perder información (datos, en realidad), cojeremos una proyección que refleje lo que nos interesa, y que deseche otras cosas.
 %
--\ln \prod_{i = 1}^{N} \mathcal{N}(t_i; w^T\phi x_i, \sigma^2) =
-			&& \textit{entiéndase bien la notación}\\
+% Es por eso que hay muchas formas de reducir la dimensión de un conjunto de datos, cada una según la prioridad que uno tenga, y cogiendo las proyecciones más adecuadas para cada necesidad.
 %
--\sum_{i = 1}^{N} \Big(\ln \mathcal{N}(t_i; w^T\phi x_i, \sigma^2) \Big) = \\
+% Ahora veremos algunas de las formas de reducir la dimensión:
+% \subsection{Principal Components Analisis (PCA)}
+% Este algoritmo tiene como prioridad preservar la varianza de los datos, maximizar la dispersión en las proyecciones.
 %
--\sum_{i = 1}^{N} \Big(\ln \big(
-\frac{1}{\sqrt{2\pi\sigma^2}}exp\Big[\frac{(t_i - w^T\phi x_i)^2}{2\sigma^2}\Big]
-\big) \Big) = \\
+% Esto es, en la analogía de la sombra, cojer la sombra que tenga más area.
 %
--\sum_{i = 1}^{N} \Big(-\ln \sqrt{2\pi\sigma^2} -
-\frac{(t_i - w^T\phi x_i)^2}{2\sigma^2}
-\Big) = \\
+% De forma más técnica:
 %
-N\ln \sqrt{2\pi\sigma^2} + \frac{1}{2\sigma^2} \sum_{i = 1}^{N} (t_i - w^T\phi x_i)^2
-\end{align*}
-
-
-Definimos:
-
-\begin{equation*}
-E(w) = \frac{1}{2} \sum_{i = 1}^{N} (t_i - w^T\phi x_i)^2
-\end{equation*}
-
-Y por lo tanto:
-
-\begin{equation*}
--l(\theta) = N\ln(\sqrt{2\pi\sigma^2}) + \frac{1}{\sigma^2} E(w)
-\end{equation*}
-
-Se puede observar que:
-\begin{equation*}
-w^T\phi x_i \equiv \Phi w
-\end{equation*}
-Y entonces se podría cambiar la definición por:
-
-\begin{equation*}
-E(w) =
-\frac{1}{2} \sum_{i = 1}^{N} (t_i - w^T\phi x_i)^2 =
-\frac{1}{2}||t - \Phi w||^2
-\end{equation*}
-
-\begin{equation*}
-E(w) =
-\frac{1}{2}||t||^2 + \frac{1}{2}||\Phi w||^2 - t^T\Phi w
-\end{equation*}
-
-
-Ahora hay que derivar $-l(\theta)$ e igualar a $0$ para encontrar los extremos:
-
-\begin{align*}
-\frac{\partial (-l)}{\partial w} =
-\frac{\partial E(w)}{\partial w} = 0 \equiv\\
+% Tenemos una muestra de datos $\{X_1,X_2,\dots, X_n\}, X_i \in \mathbb{R}^d$ que provienen de un vector aleatorio $X = \{X_1,\dots,X_n\}^T$. Cada una de las $X_i$ es una variable (aleatoria?) y tenemos $d$ muestras en cada una de las variables.
 %
-0 + 2\cdot \frac{1}{2}(\Phi w)^T\Phi - t^T\Phi = 0 \equiv \\
+% Disponemos también de la matriz de covarianzas $\Sigma$.
 %
-\Phi^T\Phi w = \Phi^Tt
-\end{align*}
+% La matriz de covarianzas es una matriz de $n \times n$ donde $\Sigma_{ij}$ es $\text{var(}X_i,X_j\text{)}$ si $i \neq j$ y $\Sigma_{ii}$ es $\sigma_i^2$
+%
+% Tenemos datos en $n$ dimensiones, y decidimos que queremos únicamente $k$ dimensiones, $k < n$, y no cualesquiera dimensiones, sino las que maximicen la varianza.
+%
+% Hemos de encontrar entonces $k$ vectores $n$-dimensionales. Encontraremos $n$ vectores que serán todos ``perpendiculares'' entre ellos y cojeremos los $k$ vectores que tengan más varianza.
+%
+% Nuestro objetivo entonces obtener un nuevo sistema de coordenadas $Y = (Y_1,\dots,Y_n)$ que cumpla estas condiciones:
+% \begin{enumerate}
+%   \item Covar($Y_i,Y_j$) $ = 0$ si $i \neq j$
+%   \item Var($Y_1$) $>$ Var($Y_2$) $> \dots > $ Var($Y_n$) (de hecho los ordenaremos decrecientemente)
+%   \item $\sum_{i = 1}^{d} Var(X_i) = \sum_{i = 1}^{d} Var(Y_i)$
+% \end{enumerate}
+%
+% Encontraremos la proyección $Y_i$ encontrando un vector $w_i$ que cumpla que $Y_i = w_i^T \cdot X$
+%
+% Como hay muchos vectores que cumplen esa condición (vectores que tienen todos la misma dirección, pero distinto módulo) establecemos la condición sobre $w_i$ de que la norma 2 al cuadrado sea 1, esto es: $||w_i||_2^2 = 1 \Rightarrow w_{i1}^2 + w_{i2}^2 + \dots + w_{in}^2 = 1$
+%
+% Objetivo: $w_1$ ha de maximizar la varianza de $Y_i$, sujeto a que $||w_i|| = 1$
+%
+% \begin{equation*}
+%   Var(Y_i) = Var(w_i^T \cdot X) = w_1^T \cdot Var(X) \cdot w_i = w_1^T \cdot \Sigma \cdot w_i
+% \end{equation*}
+%
+% Este último paso es algo que se sabe y que sale en Wikipedia. Nos lo creemos.
+%
+% Para resolver un problema de maximización sujeto a algunas condiciones se hace con el método de los multiplicadores de Lagrange.
+%
+% \subsubsection*{Anexo: método de Lagrange}
+% El método de Lagrange sirve para encontrar los extremos (máximos o mínimos) que hay en una función sujeto a algunas condiciones de igualdad. La función puede tener una cantidad arbitraria de parámetros, y se acepta también una cantidad arbitraria de condiciones.
+%
+% Si tenemos la función $f(x_1,\dots,x_n)$ y las condiciones $g_1(x_1,\dots,x_n) = 0, \dots, g_m(x_1,\dots,x_n) = 0$, definimos nuevas variables $\lambda$ (habrá una por cada condición que haya) y construimas la función de Lagrange:
+%
+% \begin{equation*}
+%   \mathcal{L}(x_1,\dots,x_n,\lambda_1,\dots, \lambda_m) = f(x_1,\dots,x_n) - \sum_{k = 1}^{m} \lambda_kg_k((x_1,\dots,x_n))
+% \end{equation*}
+%
+% En el caso particular de una función de dos parametros $f(x,y)$ y una restricción $g(x,y) = 0$ sería así:
+%
+% \begin{equation*}
+%   \mathcal{L}(x,y,\lambda) = f(x,y) - \lambda g(x,y)
+% \end{equation*}
+%
+% El siguiente paso es derivar $\mathcal{L}$ sobre cada uno de los parámetros (tanto los reales como los añadidos) e igualar todas las ecuaciones a $0$. Eso dará como resultado un sistema de ecuaciones que tendrá tantos resultados como extremos existan cumpliendo todas las condiciones.
+%
+% Ahora ya únicamente queda mirar todos esos puntos y decidir cuales son máximos o mínimos.
+%
+% \subsubsection*{Fin del Anexo: método de Lagrange}
+%
+% Entonces, nuestro problema es maximizar
+% \begin{equation*}
+%     w_i^T \cdot \Sigma \cdot w_i
+% \end{equation*}
+% sujeto a que
+% \begin{equation*}
+% \sum_{j = 1}^d \big( w_{ik}^2 \big) -1 = 0
+% \end{equation*}
+%
+% Construimos la función de Lagrange:
+%
+% \begin{equation*}
+%   \mathcal{L}(w_i,\lambda) = w_i^T \cdot \Sigma \cdot w_i - \lambda \Big( \sum_{j = 1}^d \big( w_{ik}^2 \big) -1\Big)
+% \end{equation*}
+%
+% Y derivamos e igualamos a 0:
+%
+% (No tengo muy claro cómo se hace esa derivada, pero nos creemos que es así)
+%
+% \begin{equation*}
+%   \frac{\partial \mathcal{L}}{\partial w_i} = 2\Sigma \cdot w_i - 2\lambda w_i = 0
+% \end{equation*}
+%
+% \begin{equation*}
+%   \Sigma \cdot w_i = \lambda w_i
+% \end{equation*}
+%
+% La expresión que nos ha quedado se corresponde con la definición de vector y valor propio de una matriz (\textit{eigenvector} y \textit{eigenvalue}). Se dice que $\lambda$ es un valor propio de la matriz $\Sigma$ si existe un vector $w$ tal que:
+%
+% \begin{equation*}
+%   \Sigma \cdot w = \lambda w
+% \end{equation*}
+%
+% Al vector $w$ se le llama vector propio de $\Sigma$
+%
+% Vemos entonces que los vectores de proyección $w_i$ que estamos buscando se corresponden con los vectores propios de la matriz $\Sigma$.
+%
+% Pero hemos exigido que los vectores de proyección esten ordenados decrecientemente por varianza, i. e. el primer vector de proyección $w_1$ debe ser el que tenga más varianza en la proyección, el segundo $w_2$, etc.
+%
+% Veamos cuál será la varianza del vector $w_i$
+%
+% \begin{equation*}
+%   Var(Y_i) = Var(w_i^T \cdot \Sigma) = w_i^T \cdot \Sigma \cdot w_i
+% \end{equation*}
+%
+% Pero hemos visto que
+%
+% \begin{equation*}
+%   \Sigma \cdot w_i = \lambda w_i
+% \end{equation*}
+%
+% Por lo tanto podemos sustituir:
+%
+% \begin{equation*}
+%   w_i^T \cdot \Sigma \cdot w_i = w_i^T \lambda w_i = \lambda w_i^Tw_i
+% \end{equation*}
+%
+% Y como hemos exigido que $w_i^Tw_i = 1$, tenemos que la varianza será $\lambda$
+%
+% Entonces, el orden en que hemos de cojer los vectores propios es respecto a su valor propio: primero el vector con mayor valor propio, etc.
+%
+% Pero en realidad también hemos exigido que los vectores de proyección elegidos también sean perpendiculares entre ellos. Para conseguir esto, haremos Lagrange para encontrar únicamente el primero de los vectores de proyección, y luego, para encontrar el segundo hacemos igual pero estableciendo también la condición de que el nuevo vector de proyección sea perpendicular con el primero, i, e: $w_1^Tw_2 = 0$
+%
+% Cuando tenemos todos los vectores de proyección $w_1,w_2,\dots,w_n$, podemos definir la matriz
+% \begin{equation*}
+%   A =
+%   \begin{bmatrix}
+%     w_{11} & w_{21} & \dots & w_{d1} \\
+%     w_{12} & w_{22} & \dots & w_{d2} \\
+%     \vdots & \vdots & \ddots & \vdots \\
+%     w_{1n} & w_{2n} & \dots & w_{dn} \\
+%   \end{bmatrix}
+% \end{equation*}
+%
+% Y entonces podemos decir que nuestros nuevos datos son:
+% \begin{equation*}
+%   Y = A^TX
+% \end{equation*}
+%
+% Ahora es cuando hemos de decidir con cuántos de los componentes principales nos quedamos. Si nos los quedamos todos lo único que habremos hecho será una transformación de los datos.
+%
+% Si queremos quedarnos con $m$ componentes principales y en total había $d$ ($m \leq d$), entonces
+% \begin{equation*}
+%   \frac
+%   {
+%     \sum_{i = 1}^{m} \lambda_i
+%   }
+%   {
+%     \sum_{i = 1}^{d} \lambda_i
+%   }
+%   \times 100
+% \end{equation*}
+%
+% Es el porcentaje de la varianza con el que nos estamos quedando
+%
+% \subsection{Fisher Discriminant Analysis (FDA)}
+% % TODO
+% Queda pendiente para hacer esta sección.
+%
+% Tiene que ver con hacer otro modelo para reducir la dimensión, dando prioridad a otras cosas
 
-Esa matrix, $\Phi^T\Phi$, se llama \textit{matrix de diseño}.
+%
+% \section{Clustering}
+% Clustering quiere decir agrupar. Un algoritmo de clustering recibe como entrada un conjunto de datos, y él clasifica esos datos en varios grupos, en varios clusters, en función de algún parámetro.
+%
+% Normalmente la cantidad de clusters es arbitraria, decidida por factores ajenos al problema. De hecho es un problema complicado decidir cuál es la cantidad adecuada de clusters, y existen algunos algoritmos que intentan calcularla, pero son poco genéricos.
+%
+% Para los algoritmos que trataremos aquí supondremos que la cantidad de clusters ya viene dada. Se tratará de encontrar ``dónde están'' esos clusters y ver qué elementos pertenecen a cada uno de los clusters. Como veremos, la mayoría de problemas problemas de optimización de clustering son NP-completos, y por eso buscaremos una buena solución en vez de la mejor solución.
+%
+% \subsection{Algoritmo de K-means}
+% Disponemos de un conjunto de datos $D = \{x_1, x_2, \dots, x_n\}, x_i \in \mathbb{R}^d$ y queremos encontrar $K$ prototipos (centroides) $P = \{\mu_1, \mu_2, \dots, \mu_K\}, \mu_i \in \mathbb{R}^d$ a los que asociar los datos $D$
+%
+% El criterio será minimizar la suma de distancias de cada dato $x_i$ a su cluster más cercano, que será el cluster al que esté asignado.
+%
+% Definimos una variable binaria $\pi_{ik}$:
+%
+% \begin{equation*}
+% \pi_{ik} =
+% \begin{cases}
+% 1 & \text{ si el dato $x_i$ está asignado al cluster $k$} \\
+% 0  & \text{ otherwise}
+% \end{cases}
+% \end{equation*}
+%
+% Formalmente el criterio a minimizar será:
+%
+% \begin{equation*}
+% J = \sum_{i = 1}^{N} \sum_{k = 1}^{K} \pi_{ik} ||x_i - \mu_k||^2
+% \end{equation*}
+%
+% Está demostrado que dado un conjunto de datos, encontrar la ``posición'' de $K$ clústers y la asignación de datos a clusters de la manera más optima es un problema NP-completo, de modo que para resolver esto vamos a tener un problema.
+%
+% Sin embargo, resolver la mitad del problema es fácil: si te dicen a priori la ``posición'' de cada uno de los clusters, es fácil ver qué datos hay que asignar a cada cluster. Si por el contrario te dicen qué datos irán asignados al mismo cluster, es fácil encontrar la posición de cada uno de los clusters.
+%
+% Entonces para resolver este problema, partiremos de una de las mitades del problema, que se habrá encontrado arbitrariamente, y entonces se buscará la otra mitad más óptima. A continuación se recalculará la primera mitad en función de estos datos, y este proceso se repetirá hasta que ya no se mejore más.
+%
+% De esta manera terminamos teniendo un máximo local, pero no absoluto. La calidad de la solución dependerá de los datos iniciales. Se han hecho muchos estudios sobre qué datos iniciales son más adecuados, pero al final parece que lo mejor es usar datos aleatorios de entre el conjunto de datos $D$.
+%
+% Este algoritmo es extremadamente rápido, por lo que normalmente se ejecuta varias veces con datos iniciales distintos y se mantiene el que da mejores resultados.
+%
+% % TODO hacer la demostración para ver que el método intuitivo para encontrar la segunda mitad dada la primera es realmente la mejor forma de hacerlo. Es bastante sencillo.
+%
+% Ahora faltaría ver cómo se encuentra la segunda mitad. Queda para más adelante.
+%
+% \subsection{Mezcla de Gaussianas (Mixture of Gaussians MoG)}
+%
+% El método de K-means tiene el problema de que es binario: un dato pertenece a un cluster o no pertenece, y solamente pertenece a uno. Dos datos que estén muy ``cerca'' pueden quedar en dos clusters distintos a pesar de que sean muy parecidos.
+%
+% Otra forma de verlo es que un dato pertenezca a un cluster con una cierta probabilidad. Para ello habría que definir una función de distribución que reflejara la asignación de datos a los distintos clústers. El problema es que una distribución simple (como la normal o la binomial) no tiene la capacidad para reflejar cualquier cantidad de datos y clusters. Por ello vamos a usar la Mezcla de Gaussianas. Esto no es más que asignar una distribución gaussiana (o normal) a cada uno de los clusters, y hacer la suma. De este modo con una cantidad suficiente de distribuciones normales podemos representar cualquier función de probabilidad.
+%
+% Formalizamos el problema.
+%
+% Tenemos un conjunto de datos $D = \{x_1, x_2, \dots, x_n\}, x_i \in \mathbb{R}^d$ y queremos definir $K$ clusters. Diremos que $\pi_k$ es la probabilidad que el cluster $k$ genere un dato cualquiera. Deberá cumplirse que $\sum_{k = 1}^K \pi_k = 1$
+%
+% Entonces la probabilidad de que el dato $x$ sea generado es:
+%
+% \begin{equation*}
+% p(x) = \sum_{k = 1}^{K} \pi_k \cdot \mathcal{N}(x; \mu_k, \Sigma_k)
+% \end{equation*}
+%
+% Si queremos generar datos siguiendo una MoG, lo primero que hay que hacer es elegir qué componente generará el dato, según la probabilidad que tengan ($\pi_k$) y después generar un dato siguiendo la distribución normal que esta define, como ya se ha hecho siempre.
+%
+% Para simplificar la notación a partir de ahora, supondremos la existencia de un vector $z$ que indicará componentes principales. Se trata de un vector binario de $K$ elementos en el que todos los elementos son $0$ excepto uno, que tiene un $1$ y que indica de qué componente se trata.
+%
+% Entonces diremos que:
+% \begin{equation*}
+% p(z_k = 1) = \pi_k
+% \end{equation*}
+%
+% \begin{equation*}
+% p(z) = \prod_{k = 1}^{K} \pi_k^{z_k}
+% \end{equation*}
+%
+% De hecho, se puede entender como $p(z) = \pi_1 \cdot \pi_2 \cdot \dots \cdot \pi_K$
+%
+% De la misma manera podemos decir que:
+%
+% \begin{equation*}
+% p(x | z_k = 1) = \mathcal{N}(x; \mu_k, \Sigma_k)
+% \end{equation*}
+%
+% \begin{equation*}
+% p(x | z) = \sum_{k = 1}^{K} z_k \cdot \mathcal{N}(x; \mu_k, \Sigma_k) \text{(La misma que antes hemos definido como p(x))}
+% \end{equation*}
+%
+%
+%
+% % TODO me estoy dejando una parte aquí
+%
+% Ahora vendrían más cosas, pero sigo con otro tema
 
-Y ahora habría que encontrar $w$ en función de las matrices y de $t$. Hay unas cuantas formas de abordar el problema, y la opción más obvia no da muy buenos resultados.
-
-\subsubsection{Con la función inversa}
-La primera forma de atacar el problema podría ser intentar resolver:
-
-\begin{equation*}
-w = (\Phi^T\Phi)^{-1}\Phi^Tt
-\end{equation*}
-
-Y esto asumiendo que existe la función inversa de la \textit{matriz de diseño}. Existe un teorema que demuestra que en este caso particular sí que tiene inversa, y se llama \textit{inversa de Moore-Penrose}
-
-% TODO escribir el teorema, que está en los apuntes
-
-El problema que tiene este método es que el cálculo de la inversa incluye números muy pequeños, muy cerca de $0$, y los ordenadores tienen problemas para calcularla, y cometen errores de \textit{underflow}.
-
-\subsubsection{SVD: Singular Vaue Decomposition}
- Para solucionar ese problema, hay un teorema que dice que toda matriz $A_{N\timesM}, N > M$, se puede expresar como:
-
- \begin{equation*}
-   A = U\Delta V^T
- \end{equation*}
-
- Donde:
-
- \begin{itemize}
-   \item $U$ y $V$ son ortogonales, i.e: $U^TU = I$, $V^TV = I$
-   \item 
- \end{itemize}
+% 
+%
+% \section{Modelos lineales de regresión}
+% Lo que se vió en el tema 1 sobre el ajuste polinómico no es más que un caso concreto de los modelos lineales de regresión,
+% en el que las funciones de base eran obligatoriamente exponenciales.
+%
+% Ahora vamos a ver el caso genérico.
+%
+% \subsection{Introducción al concepto de función de base (Basis Function, BF)}
+% Si tenemos datos $x \in \mathbb{R}^d$, y queremos predecir un dato $t$, igual que con el ajuste polinómico, definimos una colección de funciones $\phi_j: \mathbb{R}^d \rightarrow \mathbb{R}$ para definir el siguiente modelo:
+%
+% % Entonces podemos definir un modelo como:
+%
+% \begin{equation*}
+% y(x,w) = \phi_0(x) + \sum_{j = 1}^{n-1} w_j\phi_j(x),
+% \end{equation*}
+%
+% El caso del ajuste polinómico es cuando se establece la condición de que $\phi_j(x) = x^j$. Ahora podemos usar un conjunto
+% más grande de funciones de base, incluídos los senos y cosenos.
+%
+% \subsection{El método de mínimos cuadrados}
+% Como siempre, consideraremos:
+%
+% \begin{equation*}
+% t = f(x) + \epsilon, \epsilon \sim \mathcal{N}(0, \sigma^2)
+% \end{equation*}
+%
+% Es decir, que los datos de salida dependen de los datos que podemos medir ($x$) y de datos que no podemos pedir ($\epsilon$), que consideraremos ruido, y trabajaremos con la asunción de que ese ruido sigue una distribución normal centrada en $0$ y con varianza $\sigma^2$.
+%
+% Entonces definiremos:
+%
+% \begin{equation*}
+% p(t | x, w, \sigma^2) = \mathcal{N}(t; y(x,w), \sigma^2)
+% \end{equation*}
+%
+% Esto es, la probabilidad de que la salida sea $t$ asumiendo los datos $x, w, \sigma^2$.
+%
+% Abordamos el problema de decidir qué parámetros $w \in \mathbb{R}^M$ y $\sigma^2 \in \mathbb{R}$ deberíamos elegir para modelar los más acertadamente posible un conjunto de datos $D = \{x_1, x_2, \dots, x_n\}, x_i \in \mathbb{R}^d$ (que son i.i.d)
+% que da como resultado $t \in \mathbb{R}^N$
+%
+% Igual que en ajuste polinómico, todavía no sabemos qué cantidad de funciones de base deberíamos usar. De momento, definimos que usaremos $M$ funciones de base.
+%
+% Se usará para los siguientes cálculos la notación matricial, que deja implícitos muchos cálculos. Para que se entienda bien, se definen los siguientes datos:
+%
+%
+% \begin{equation*}
+% X =
+% \begin{bmatrix}
+% \leftarrow & x_1 & \rightarrow \\
+% \leftarrow & x_2 & \rightarrow \\
+% \vdots \\
+% \leftarrow & x_n & \rightarrow \\
+% \end{bmatrix}
+% =
+% \begin{bmatrix}
+% x_{11} & x_{12} & \dots & x_{1d} \\
+% x_{21} & x_{22} & \dots & x_{2d} \\
+% \vdots & \vdots & \ddots & \vdots \\
+% x_{n1} & x_{n2} & \dots & x_{nd}
+% \end{bmatrix}
+% \end{equation*}
+%
+%
+%
+% \begin{equation*}
+% t =
+% \begin{bmatrix}
+% t_1 \\
+% t_2 \\
+% \vdots \\
+% t_n
+% \end{bmatrix}
+% \end{equation*}
+%
+% \begin{equation*}
+% \phi =
+% \begin{bmatrix}
+% \phi_1 \\
+% \phi_2 \\
+% \vdots \\
+% \phi_M
+% \end{bmatrix}
+% \end{equation*}
+%
+%
+%
+% \begin{equation*}
+% \Phi =
+% \begin{bmatrix}
+% \phi_0(x_1) & \phi_1(x_1) & \dots & \phi_{M-1}(x_1) \\
+% \phi_0(x_2) & \phi_1(x_2) & \dots & \phi_{M-1}(x_2) \\
+% \vdots & \vdots & \ddots & \vdots \\
+% \phi_0(x_n) & \phi_1(x_n) & \dots & \phi_{M-1}(x_n) \\
+% \end{bmatrix}
+% \end{equation*}
+%
+% Sacamos entonces la función de verosimilitud que ofrecen los parámetros $\theta = (w, \sigma^2)$ usando el logaritmo negado de la probabilidad de obtener los datos $t$ mediante los datos $X$. Esta función es la que habrá que maximizar.
+%
+% \begin{align*}
+% -l(\theta) = \\
+% -l(w, \sigma^2) =\\
+% %
+% -\ln P(t | X, w, \sigma^2) = \\
+% %
+% -\ln \prod_{i}^{N} p(t_i | X_i, w, \sigma^2) = \\
+% %
+% -\ln \prod_{i = 1}^{N} \mathcal{N}(t_i; y(x_i, w), \sigma^2) = \\
+% %
+% -\ln \prod_{i = 1}^{N} \mathcal{N}(t_i; w^T\phi x_i, \sigma^2) =
+% 			&& \textit{entiéndase bien la notación}\\
+% %
+% -\sum_{i = 1}^{N} \Big(\ln \mathcal{N}(t_i; w^T\phi x_i, \sigma^2) \Big) = \\
+% %
+% -\sum_{i = 1}^{N} \Big(\ln \big(
+% \frac{1}{\sqrt{2\pi\sigma^2}}exp\Big[\frac{(t_i - w^T\phi x_i)^2}{2\sigma^2}\Big]
+% \big) \Big) = \\
+% %
+% -\sum_{i = 1}^{N} \Big(-\ln \sqrt{2\pi\sigma^2} -
+% \frac{(t_i - w^T\phi x_i)^2}{2\sigma^2}
+% \Big) = \\
+% %
+% N\ln \sqrt{2\pi\sigma^2} + \frac{1}{2\sigma^2} \sum_{i = 1}^{N} (t_i - w^T\phi x_i)^2
+% \end{align*}
+%
+%
+% Definimos:
+%
+% \begin{equation*}
+% E(w) = \frac{1}{2} \sum_{i = 1}^{N} (t_i - w^T\phi x_i)^2
+% \end{equation*}
+%
+% Y por lo tanto:
+%
+% \begin{equation*}
+% -l(\theta) = N\ln(\sqrt{2\pi\sigma^2}) + \frac{1}{\sigma^2} E(w)
+% \end{equation*}
+%
+% Se puede observar que:
+% \begin{equation*}
+% w^T\phi x_i \equiv \Phi w
+% \end{equation*}
+% Y entonces se podría cambiar la definición por:
+%
+% \begin{equation*}
+% E(w) =
+% \frac{1}{2} \sum_{i = 1}^{N} (t_i - w^T\phi x_i)^2 =
+% \frac{1}{2}||t - \Phi w||^2
+% \end{equation*}
+%
+% \begin{equation*}
+% E(w) =
+% \frac{1}{2}||t||^2 + \frac{1}{2}||\Phi w||^2 - t^T\Phi w
+% \end{equation*}
+%
+%
+% Ahora hay que derivar $-l(\theta)$ e igualar a $0$ para encontrar los extremos:
+%
+% \begin{align*}
+% \frac{\partial (-l)}{\partial w} =
+% \frac{\partial E(w)}{\partial w} = 0 \equiv\\
+% %
+% 0 + 2\cdot \frac{1}{2}(\Phi w)^T\Phi - t^T\Phi = 0 \equiv \\
+% %
+% \Phi^T\Phi w = \Phi^Tt
+% \end{align*}
+%
+% Esa matrix, $\Phi^T\Phi$, se llama \textit{matrix de diseño}.
+%
+% Y ahora habría que encontrar $w$ en función de las matrices y de $t$. Hay unas cuantas formas de abordar el problema, y la opción más obvia no da muy buenos resultados.
+%
+% \subsubsection{Con la función inversa}
+% La primera forma de atacar el problema podría ser intentar resolver:
+%
+% \begin{equation*}
+% w = (\Phi^T\Phi)^{-1}\Phi^Tt
+% \end{equation*}
+%
+% Y esto asumiendo que existe la función inversa de la \textit{matriz de diseño}. Existe un teorema que demuestra que en este caso particular sí que tiene inversa, y se llama \textit{inversa de Moore-Penrose}
+%
+% % TODO escribir el teorema, que está en los apuntes
+%
+% El problema que tiene este método es que el cálculo de la inversa incluye números muy pequeños, muy cerca de $0$, y los ordenadores tienen problemas para calcularla, y cometen errores de \textit{underflow}.
+%
+% \subsubsection{SVD: Singular Vaue Decomposition}
+%  Para solucionar ese problema, hay un teorema que dice que toda matriz $A_{N\timesM}, N > M$, se puede expresar como:
+%
+%  \begin{equation*}
+%    A = U\Delta V^T
+%  \end{equation*}
+%
+%  Donde:
+%
+%  \begin{itemize}
+%    \item $U$ y $V$ son ortogonales, i.e: $U^TU = I$, $V^TV = I$
+%    \item
+%  \end{itemize}
 
 
 \end{document}

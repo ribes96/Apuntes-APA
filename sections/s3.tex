@@ -1,0 +1,89 @@
+
+\section{Clustering}
+Clustering quiere decir agrupar. Un algoritmo de clustering recibe como entrada un conjunto de datos, y él clasifica esos datos en varios grupos, en varios clusters, en función de algún parámetro.
+
+Normalmente la cantidad de clusters es arbitraria, decidida por factores ajenos al problema. De hecho es un problema complicado decidir cuál es la cantidad adecuada de clusters, y existen algunos algoritmos que intentan calcularla, pero son poco genéricos.
+
+Para los algoritmos que trataremos aquí supondremos que la cantidad de clusters ya viene dada. Se tratará de encontrar ``dónde están'' esos clusters y ver qué elementos pertenecen a cada uno de los clusters. Como veremos, la mayoría de problemas problemas de optimización de clustering son NP-completos, y por eso buscaremos una buena solución en vez de la mejor solución.
+
+\subsection{Algoritmo de K-means}
+Disponemos de un conjunto de datos $D = \{x_1, x_2, \dots, x_n\}, x_i \in \mathbb{R}^d$ y queremos encontrar $K$ prototipos (centroides) $P = \{\mu_1, \mu_2, \dots, \mu_K\}, \mu_i \in \mathbb{R}^d$ a los que asociar los datos $D$
+
+El criterio será minimizar la suma de distancias de cada dato $x_i$ a su cluster más cercano, que será el cluster al que esté asignado.
+
+Definimos una variable binaria $\pi_{ik}$:
+
+\begin{equation*}
+\pi_{ik} =
+\begin{cases}
+1 & \text{ si el dato $x_i$ está asignado al cluster $k$} \\
+0  & \text{ otherwise}
+\end{cases}
+\end{equation*}
+
+Formalmente el criterio a minimizar será:
+
+\begin{equation*}
+J = \sum_{i = 1}^{N} \sum_{k = 1}^{K} \pi_{ik} ||x_i - \mu_k||^2
+\end{equation*}
+
+Está demostrado que dado un conjunto de datos, encontrar la ``posición'' de $K$ clústers y la asignación de datos a clusters de la manera más optima es un problema NP-completo, de modo que para resolver esto vamos a tener un problema.
+
+Sin embargo, resolver la mitad del problema es fácil: si te dicen a priori la ``posición'' de cada uno de los clusters, es fácil ver qué datos hay que asignar a cada cluster. Si por el contrario te dicen qué datos irán asignados al mismo cluster, es fácil encontrar la posición de cada uno de los clusters.
+
+Entonces para resolver este problema, partiremos de una de las mitades del problema, que se habrá encontrado arbitrariamente, y entonces se buscará la otra mitad más óptima. A continuación se recalculará la primera mitad en función de estos datos, y este proceso se repetirá hasta que ya no se mejore más.
+
+De esta manera terminamos teniendo un máximo local, pero no absoluto. La calidad de la solución dependerá de los datos iniciales. Se han hecho muchos estudios sobre qué datos iniciales son más adecuados, pero al final parece que lo mejor es usar datos aleatorios de entre el conjunto de datos $D$.
+
+Este algoritmo es extremadamente rápido, por lo que normalmente se ejecuta varias veces con datos iniciales distintos y se mantiene el que da mejores resultados.
+
+% TODO hacer la demostración para ver que el método intuitivo para encontrar la segunda mitad dada la primera es realmente la mejor forma de hacerlo. Es bastante sencillo.
+
+Ahora faltaría ver cómo se encuentra la segunda mitad. Queda para más adelante.
+
+\subsection{Mezcla de Gaussianas (Mixture of Gaussians MoG)}
+
+El método de K-means tiene el problema de que es binario: un dato pertenece a un cluster o no pertenece, y solamente pertenece a uno. Dos datos que estén muy ``cerca'' pueden quedar en dos clusters distintos a pesar de que sean muy parecidos.
+
+Otra forma de verlo es que un dato pertenezca a un cluster con una cierta probabilidad. Para ello habría que definir una función de distribución que reflejara la asignación de datos a los distintos clústers. El problema es que una distribución simple (como la normal o la binomial) no tiene la capacidad para reflejar cualquier cantidad de datos y clusters. Por ello vamos a usar la Mezcla de Gaussianas. Esto no es más que asignar una distribución gaussiana (o normal) a cada uno de los clusters, y hacer la suma. De este modo con una cantidad suficiente de distribuciones normales podemos representar cualquier función de probabilidad.
+
+Formalizamos el problema.
+
+Tenemos un conjunto de datos $D = \{x_1, x_2, \dots, x_n\}, x_i \in \mathbb{R}^d$ y queremos definir $K$ clusters. Diremos que $\pi_k$ es la probabilidad que el cluster $k$ genere un dato cualquiera. Deberá cumplirse que $\sum_{k = 1}^K \pi_k = 1$
+
+Entonces la probabilidad de que el dato $x$ sea generado es:
+
+\begin{equation*}
+p(x) = \sum_{k = 1}^{K} \pi_k \cdot \mathcal{N}(x; \mu_k, \Sigma_k)
+\end{equation*}
+
+Si queremos generar datos siguiendo una MoG, lo primero que hay que hacer es elegir qué componente generará el dato, según la probabilidad que tengan ($\pi_k$) y después generar un dato siguiendo la distribución normal que esta define, como ya se ha hecho siempre.
+
+Para simplificar la notación a partir de ahora, supondremos la existencia de un vector $z$ que indicará componentes principales. Se trata de un vector binario de $K$ elementos en el que todos los elementos son $0$ excepto uno, que tiene un $1$ y que indica de qué componente se trata.
+
+Entonces diremos que:
+\begin{equation*}
+p(z_k = 1) = \pi_k
+\end{equation*}
+
+\begin{equation*}
+p(z) = \prod_{k = 1}^{K} \pi_k^{z_k}
+\end{equation*}
+
+De hecho, se puede entender como $p(z) = \pi_1 \cdot \pi_2 \cdot \dots \cdot \pi_K$
+
+De la misma manera podemos decir que:
+
+\begin{equation*}
+p(x | z_k = 1) = \mathcal{N}(x; \mu_k, \Sigma_k)
+\end{equation*}
+
+\begin{equation*}
+p(x | z) = \sum_{k = 1}^{K} z_k \cdot \mathcal{N}(x; \mu_k, \Sigma_k) \text{(La misma que antes hemos definido como p(x))}
+\end{equation*}
+
+
+
+% TODO me estoy dejando una parte aquí
+
+Ahora vendrían más cosas, pero sigo con otro tema

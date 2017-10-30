@@ -1,0 +1,33 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{ marvosym }
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{subfiles}
+
+
+\newcommand{\addfile}[1]{\subfile{sections/#1}}
+
+
+
+%opening
+\title{Apuntes Tema 1}
+\author{Albert Ribes Marzá}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Los apuntes que vaya tomando en clase
+\end{abstract}
+
+
+\addfile{s1}
+\addfile{s2}
+\addfile{s3}
+\addfile{s4}
+
+
+\end{document}
