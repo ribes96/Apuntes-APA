@@ -1,0 +1,32 @@
+\section{Clasificadores lineales}
+Una clasificación es una función $y: \mathbb{R}^d \Rightarrow \{1 \dots k\}$
+que particiona $\mathbb{R}^d$ en $k$ subespacios.
+
+Definimos una región $R_k$ como $R_k = \{x \in \mathbb{R}^d | y(x) = k \}$. Las
+separaciones entre regiones se llaman \textit{fronteras} o ``superficies
+de decisión''. Un modelo lineal de clasificación se caracteriza porque las
+fronteras que genera son hiperplanos (en $\mathbb{R}^{d - 1}$)
+
+Hay muchos tipos de clasificadores, pero los que comunmente son más
+interesantes son los probabilísticos, i.e, clasificadores que dado un
+dato $x$ indican la probabilidad de pertenencia a cada una de las regiones.
+
+Puesto que queremos clasificadores lineales, seguiremos usando e método de
+multiplicar y sumar la antrada con pesos, pero ahora tenemos la condición de
+que el resultado sea una probabilidad, y para ello el primer paso es que esté
+acotado en el intervalo $(0,1)$.
+
+Nuestro problema de momento será encontrar una función $g$ de la forma
+$x \Rightarrow y(x) = g(x^Tx + x_0)$, donde $g: \mathbb{R} \Rightarrow (0,1)$
+
+A esta función le vamos a exigir que sea continua, estrictamente creciente,
+derivable en el intervalo y que tenga una inversa, y comunmente a esta función
+se le llama \textit{función de activación}.
+
+Un posible ejemplo de la función de activación es la \textit{función logística},
+que se define como $g(z) = \frac{1}{1 - e^{-z}}$. Para esta en particular, $g(z)' = g(z) [1 - g(z)]$, $g(-z) =   1 - g(z)$ y $g(x)^{-1} = \ln(\frac{z}{1 - z})$
+
+\subsection{Fórmula de Bayes}
+
+\todo[inline]{Explicar de dónde viene la fórmula de Bayes y poner
+el ejemplo de los Halcones y las Águilas}
