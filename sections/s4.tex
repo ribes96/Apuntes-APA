@@ -177,6 +177,9 @@ w = (\Phi^T\Phi)^{-1}\Phi^Tt
 
 Y esto asumiendo que existe la función inversa de la \textit{matriz de diseño}. Existe un teorema que demuestra que en este caso particular sí que tiene inversa, y se llama \textit{inversa de Moore-Penrose}
 
+\todo[inline]{Poner y explicar el teorema que demuestra que la
+matriz de diseño para resolver las equciones de Gauss tiene inversa}
+
 % TODO escribir el teorema, que está en los apuntes
 
 El problema que tiene este método es que el cálculo de la inversa incluye números muy pequeños, muy cerca de $0$, y los ordenadores tienen problemas para calcularla, y cometen errores de \textit{underflow}.
@@ -194,3 +197,6 @@ El problema que tiene este método es que el cálculo de la inversa incluye núm
    \item $U$ y $V$ son ortogonales, i.e: $U^TU = I$, $V^TV = I$
    \item
  \end{itemize}
+
+ \todo[inline]{Terminar de explicar como funciona la SVD
+ (Singular Value Decomposition)}

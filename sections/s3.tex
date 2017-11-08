@@ -39,6 +39,8 @@ Este algoritmo es extremadamente rápido, por lo que normalmente se ejecuta vari
 
 % TODO hacer la demostración para ver que el método intuitivo para encontrar la segunda mitad dada la primera es realmente la mejor forma de hacerlo. Es bastante sencillo.
 
+\todo[inline]{Formalizar el algoritmo de k-means y demostrar que es correcto}
+
 Ahora faltaría ver cómo se encuentra la segunda mitad. Queda para más adelante.
 
 \subsection{Mezcla de Gaussianas (Mixture of Gaussians MoG)}
@@ -82,7 +84,10 @@ p(x | z_k = 1) = \mathcal{N}(x; \mu_k, \Sigma_k)
 p(x | z) = \sum_{k = 1}^{K} z_k \cdot \mathcal{N}(x; \mu_k, \Sigma_k) \text{(La misma que antes hemos definido como p(x))}
 \end{equation*}
 
+\todo[inline]{¿Cómo encontrar los parámetros adecuados de una MoG mediente la
+máxima verosimilitud.}
 
+\todo[inline]{Explicar la relación que hay entre k-means y E-M (el de MoG)}
 
 % TODO me estoy dejando una parte aquí
 

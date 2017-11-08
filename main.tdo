@@ -1,0 +1,6 @@
+\contentsline {todo}{Reducci\IeC {\'o}n de dimensi\IeC {\'o}n con FDA}{9}
+\contentsline {todo}{Formalizar el algoritmo de k-means y demostrar que es correcto}{10}
+\contentsline {todo}{\IeC {\textquestiondown }C\IeC {\'o}mo encontrar los par\IeC {\'a}metros adecuados de una MoG mediente la m\IeC {\'a}xima verosimilitud.}{12}
+\contentsline {todo}{Explicar la relaci\IeC {\'o}n que hay entre k-means y E-M (el de MoG)}{12}
+\contentsline {todo}{Poner y explicar el teorema que demuestra que la matriz de dise\IeC {\~n}o para resolver las equciones de Gauss tiene inversa}{14}
+\contentsline {todo}{Terminar de explicar como funciona la SVD (Singular Value Decomposition)}{15}
