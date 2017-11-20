@@ -29,4 +29,72 @@ que se define como $g(z) = \frac{1}{1 - e^{-z}}$. Para esta en particular, $g(z)
 \subsection{Fórmula de Bayes}
 
 \todo[inline]{Explicar de dónde viene la fórmula de Bayes y poner
-el ejemplo de los Halcones y las Águilas}
+el ejemplo de los Halcones y las Águilas }
+
+
+\subsection{Clasificadores (Bayesianos) generativos}
+Si tenemos dos clases ($K = 2$), la probabilidad de que el dato
+$x$ pertenezca a la clase $C_1$ es:
+
+\begin{eqnarray*}
+  P(C_1 | x)
+  &=&
+  \frac{P(x | C_1) P(C_1)}
+  {
+  P(x | C_1)P(P_1) + P(x | C_2)P(C_2)
+  } \\
+  %
+  &=&
+  \frac{1}
+  {
+  1 + \frac
+  {P(x | C_2)P(C_2)}
+  {P(x | C_1)P(C_1)}
+  }
+\end{eqnarray*}
+
+Si ahora definimos:
+
+\begin{equation*}
+  a(x) = \ln
+  \frac
+  {P(x | C_1)P(C_1)}
+  {P(x | C_2)P(C_2)}
+\end{equation*}
+
+La probabilidad es:
+
+\begin{equation*}
+  P(C_1 | x) = \frac{1}
+  {1 + exp(-a(x))}
+\end{equation*}
+
+Esta es una \textit{función logística} que se conoce como
+``\textit{log of the odds}''
+
+El caso genérico para $K \geq 2$ clases es:
+
+\begin{eqnarray*}
+  P(C_k | x)
+  &=&
+  \frac
+  {P(x | C_k)P(C_k)}
+  {
+  \sum_{j = 1}^{K} P(x | C_j)P(C_j)
+  } \\
+  %
+  &=&
+  \frac
+  {exp(a_k(x))}
+  {\sum_{j = 1}^{K} P(x | C_j)P(C_j)}
+\end{eqnarray*}
+
+Ahora hemos generalizado la definición con:
+
+\begin{equation*}
+  a_k(x) = \ln
+  P(x | C_k)P(C_k)
+\end{equation*}
+
+
+Esta función se llama \textit{softmax}
