@@ -6,3 +6,5 @@
 \contentsline {todo}{Terminar de explicar como funciona la SVD (Singular Value Decomposition)}{15}
 \contentsline {todo}{Explicar la regularizaci\IeC {\'o}n (con lambda) con el m\IeC {\'e}todo de m\IeC {\'\i }nimos cuadrados}{15}
 \contentsline {todo}{Explicar de d\IeC {\'o}nde viene la f\IeC {\'o}rmula de Bayes y poner el ejemplo de los Halcones y las \IeC {\'A}guilas }{15}
+\contentsline {todo}{Explicar los problemas en QDA y LDA cuando hay m\IeC {\'a}s atributos que n\IeC {\'u}mero de ejemplos o cuando las matrices de varianza no son invertibles.}{17}
+\contentsline {todo}{Explicar tambi\IeC {\'e}n RDA}{17}

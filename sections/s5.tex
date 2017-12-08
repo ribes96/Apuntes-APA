@@ -11,25 +11,25 @@ Hay muchos tipos de clasificadores, pero los que comunmente son más
 interesantes son los probabilísticos, i.e, clasificadores que dado un
 dato $x$ indican la probabilidad de pertenencia a cada una de las regiones.
 
-Puesto que queremos clasificadores lineales, seguiremos usando e método de
-multiplicar y sumar la antrada con pesos, pero ahora tenemos la condición de
+Puesto que queremos clasificadores lineales, seguiremos usando el método de
+multiplicar y sumar la entrada con pesos, pero ahora tenemos la condición de
 que el resultado sea una probabilidad, y para ello el primer paso es que esté
 acotado en el intervalo $(0,1)$.
 
 Nuestro problema de momento será encontrar una función $g$ de la forma
-$x \Rightarrow y(x) = g(x^Tx + x_0)$, donde $g: \mathbb{R} \Rightarrow (0,1)$
+$x \Rightarrow y(x) = g(w^Tx + w_0)$, donde $g: \mathbb{R} \Rightarrow (0,1)$
 
 A esta función le vamos a exigir que sea continua, estrictamente creciente,
 derivable en el intervalo y que tenga una inversa, y comunmente a esta función
 se le llama \textit{función de activación}.
 
 Un posible ejemplo de la función de activación es la \textit{función logística},
-que se define como $g(z) = \frac{1}{1 - e^{-z}}$. Para esta en particular, $g(z)' = g(z) [1 - g(z)]$, $g(-z) =   1 - g(z)$ y $g(x)^{-1} = \ln(\frac{z}{1 - z})$
+que se define como $g(z) = \frac{1}{1 - e^{-z}}$. Para esta en particular, $g(z)' = g(z) [1 - g(z)]$, $g(-z) =   1 - g(z)$ y $g(z)^{-1} = \ln(\frac{z}{1 - z})$
 
 \subsection{Fórmula de Bayes}
 
 \todo[inline]{Explicar de dónde viene la fórmula de Bayes y poner
-el ejemplo de los Halcones y las Águilas }
+ el ejemplo de los Halcones y las Águilas }
 
 
 \subsection{Clasificadores (Bayesianos) generativos}
@@ -37,36 +37,36 @@ Si tenemos dos clases ($K = 2$), la probabilidad de que el dato
 $x$ pertenezca a la clase $C_1$ es:
 
 \begin{eqnarray*}
-  P(C_1 | x)
-  &=&
-  \frac{P(x | C_1) P(C_1)}
-  {
+ P(C_1 | x)
+ &=&
+ \frac{P(x | C_1) P(C_1)}
+ {
   P(x | C_1)P(P_1) + P(x | C_2)P(C_2)
-  } \\
-  %
-  &=&
-  \frac{1}
-  {
+ } \\
+ %
+ &=&
+ \frac{1}
+ {
   1 + \frac
   {P(x | C_2)P(C_2)}
   {P(x | C_1)P(C_1)}
-  }
+ }
 \end{eqnarray*}
 
 Si ahora definimos:
 
 \begin{equation*}
-  a(x) = \ln
-  \frac
-  {P(x | C_1)P(C_1)}
-  {P(x | C_2)P(C_2)}
+ a(x) = \ln
+ \frac
+ {P(x | C_1)P(C_1)}
+ {P(x | C_2)P(C_2)}
 \end{equation*}
 
 La probabilidad es:
 
 \begin{equation*}
-  P(C_1 | x) = \frac{1}
-  {1 + exp(-a(x))}
+ P(C_1 | x) = \frac{1}
+ {1 + exp(-a(x))}
 \end{equation*}
 
 Esta es una \textit{función logística} que se conoce como
@@ -75,26 +75,124 @@ Esta es una \textit{función logística} que se conoce como
 El caso genérico para $K \geq 2$ clases es:
 
 \begin{eqnarray*}
-  P(C_k | x)
-  &=&
-  \frac
-  {P(x | C_k)P(C_k)}
-  {
+ P(C_k | x)
+ &=&
+ \frac
+ {P(x | C_k)P(C_k)}
+ {
   \sum_{j = 1}^{K} P(x | C_j)P(C_j)
-  } \\
-  %
-  &=&
-  \frac
-  {exp(a_k(x))}
-  {\sum_{j = 1}^{K} P(x | C_j)P(C_j)}
+ } \\
+ %
+ &=&
+ \frac
+ {exp(a_k(x))}
+ {\sum_{j = 1}^{K} P(x | C_j)P(C_j)}
 \end{eqnarray*}
 
 Ahora hemos generalizado la definición con:
 
 \begin{equation*}
-  a_k(x) = \ln
-  P(x | C_k)P(C_k)
+ a_k(x) = \ln
+ P(x | C_k)P(C_k)
 \end{equation*}
 
 
-Esta función se llama \textit{softmax}
+Esta función se llama \textit{softmax}, y es una generalización de la \textit{función logística}. Este tipo de modelos se llaman ``modelos generativos'', porque requieren conocer $P(x | C)$, y una vez sabes eso, eres capaz de generar nuevos datos en la clase $C$
+
+\paragraph{Ejemplo: Generador Gaussiano}
+Si asumimos que los datos de la clase $C_k$ siguen una distribución guassiana, entonces
+
+\begin{equation*}
+    P(x | C_k) =
+    \frac{1}{(2\pi)^{\frac{d}{2}}}
+    \frac{1}{|\Sigma_k|^{\frac{1}{2}}}
+    exp\Big(
+    -\frac{1}{2}
+    (x - \mu_k)^T
+    \Sigma_k^{-1}
+    (x - \mu_k)
+    \Big)
+\end{equation*}
+
+Para el caso $K = 2$ previamente hemos definido
+
+\begin{equation*}
+    a(x) = \ln
+    \frac
+    {
+    P(x|C_1)P(C_1)
+    }{P(x | C_2)P(C_2)}
+\end{equation*}
+
+Puesto que sabemos que los datos siguen una distribución normal, lo podemos escribir como:
+
+\begin{align*}
+    a(x) &= \ln(P(x|C_1)P(C_1)) - \ln(P(x | C_2)P(C_2)) \\
+    %
+    a(x) &=
+    \begin{aligned}[t]
+        &\ln(\cancel{\mcirc}) -\frac{1}{2}\ln(|\Sigma_1|) -\frac{1}{2}
+        (x - \mu_1)^T
+        \Sigma_1^{-1}
+        (x - \mu_1) + \ln(P(C_1)) \\
+        &-\ln(\cancel{\mcirc}) + \frac{1}{2}\ln(|\Sigma_2|) + \frac{1}{2}
+        (x - \mu_2)^T
+        \Sigma_2^{-1}
+        (x - \mu_2) -\ln(P(C_2)) \\
+    \end{aligned}\\
+\end{align*}
+
+Donde $\ln(\cancel{\mcirc}) = \ln \frac{1}{(2\pi)^{\frac{d}{2}}}$, que es constante en los dos términos y se anula.
+
+Con esto ya podemos calcular $P(C_1|x)$. A este clasificador se le llama \textit{Quadratic Discriminant Analysis} (QDA).
+
+Si se asume que $\Sigma_1 = \Sigma_2 = \Sigma$, entonces la ecuación anterior se simplifica, deja de ser cuadrática y es lineal:
+
+\begin{equation*}
+    a(x) = w^Tx + w_0
+\end{equation*}
+
+Donde $w = \Sigma^{-1} (\mu_1 - \mu_2)$ y $w_0 = \frac{1}{2}\mu_2^T\Sigma^{-1}\mu_2 + \frac{1}{2}\mu_1^T\Sigma^{-1}\mu_1 + \ln \frac{p(C_1)}{P(C_2)}$
+
+Esta, como es lineal, se llama \textit{Linear Discriminant Analysis} (LDA)
+
+¿Y qué ocurre cuando $K \geq 2$? Entonces se usa la definición
+
+\begin{equation*}
+    a_k(x) = \ln P(x|C_k)P(C_k)
+\end{equation*}
+
+Que sustituyendo queda como:
+
+\begin{equation*}
+    a_k(x) = -\frac{1}{2}\ln|\Sigma_k| - \frac{1}{2}(x - \mu_k)^T\Sigma_k^{-1}(x - \mu_k) + \ln P(C_k)
+\end{equation*}
+
+Y ésta es la fórmula general para QDA. Si se vuelve a asumir que todas las clases tienen la misma varianza, entonces $a_k(x) = w_k^Tx + w_0$, donde $w_k = \Sigma^{-1}\mu_k$ y $w_0 = \frac{1}{2}\mu_k^T\Sigma^{-1}\mu_k + \ln P(C_k)$. Ésta es la fórmula general para LDA.
+
+\subsubsection{Cálculos en la práctica}
+
+\todo[inline]{Explicar los problemas en QDA y LDA cuando hay más atributos que número de ejemplos o cuando las matrices de varianza no son invertibles.}
+\todo[inline]{Explicar también RDA}
+
+
+\subsection{Naive Bayes}
+Cuando el problema de clasificación es multivariado, lo que queremos representar es:
+
+\begin{equation*}
+    P(x | C_k) = P(X_1 = x_1 \wedge X_2 = x_2 \wedge \dots \wedge X_d = X_d | C_k)
+\end{equation*}
+
+En probabilidades, se sabe que
+
+\begin{equation*}
+    P(X_1,X_2,X_3) = P(X_3 | X_1,X_2) P(X_2 | X_1) P(X_1)
+\end{equation*}
+
+Entonces se podría representar el problema como
+
+\begin{equation*}
+    P(x | C_k )P(C_k) =
+    P(X_1 = x_1 | C_k)P(C_k)
+    \prod_{j = 2}^{d} P(X_j = x_j | X_{j - 1} = x_{j - 1} \wedge \dots \wedge X_1 = x_1 \wedge C_k)
+\end{equation*}

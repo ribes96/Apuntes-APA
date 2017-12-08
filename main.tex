@@ -6,6 +6,11 @@
 \usepackage{amsmath}
 \usepackage{subfiles}
 \usepackage{todonotes}
+\usepackage{cancel}
+\usepackage{scalerel}
+
+\def\mcirc{\mathbin{\scalerel*{\circ}{j}}}
+\def\msquare{\mathord{\scalerel*{\Box}{gX}}}
 
 
 \newcommand{\addfile}[1]{\subfile{sections/#1}}
