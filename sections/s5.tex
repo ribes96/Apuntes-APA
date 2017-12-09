@@ -196,3 +196,87 @@ Entonces se podría representar el problema como
     P(X_1 = x_1 | C_k)P(C_k)
     \prod_{j = 2}^{d} P(X_j = x_j | X_{j - 1} = x_{j - 1} \wedge \dots \wedge X_1 = x_1 \wedge C_k)
 \end{equation*}
+
+
+Pero si hacemos la asunción de que cada una de las variables es independientemente de todas las demás, la probabilidad se simplifica:
+
+\begin{eqnarray*}
+    P(x|C_k)P(C_k) &=&
+    P(X_1 = x_1 | C_k)P(C_k)
+    \prod_{j = 2}^{d} P(X_j = x_j | C_k)P(C_K) \\
+    %
+    &=&
+    P(C_k)\prod_{j = 1}^{d} P(X_j = x_j | C_k)
+\end{eqnarray*}
+
+
+
+Como es un producto de elementos en $[0,1]$ es conveniente trabajar con el logaritmo:
+
+\begin{equation*}
+    \ln NB_k(x) = \ln(P(C_j)) + \sum_{j = 1}^{d} \ln P(X_j = x_j | C_k)
+\end{equation*}
+
+Este método tiene la ventaja de que permite trabajar con tipos de datos distintos: la variable $X_1$ podría ser contínua y se podría modelar con una distribución normal mientras que la variable $X_2$ podría ser discreta, y usar la proporción de elementos como probabilidad.
+
+\subsection{Nearest Neighbours (KNN)}
+
+Dado un espacio $X$, definimos una función $d: X + X \rightarrow \mathbb{R}^+ \cup \{0\}$, con las siguientes propiedades para $\forall x,y \in X$:
+
+\begin{enumerate}
+    \item $d(x,y) == 0 \Rightarrow x == y$
+    \item $d(x,x) == 0$
+    \item $d(x,y) == d(y,x)$
+    \item $d(x,y) \leq d(x,z) + d(z,y)$ (Desigualdad triangular)
+\end{enumerate}
+
+Decimos que $d$ es una métrica. Dado un conjunto de datos $D = \{(x_1, t_1), \dots, (x_n, t_n)\}$ fijamos un $K \in \mathbb{N}$. Dado un punto $x^*$ a predecir, donde $x^* \notin D$, $t^*$ es la clase mayoritaria entre los $K$ datos más cercanos a $x^*$ según la métrica que se ha definido. En caso de empate, KNN se resuelve al azar.
+
+
+\todo[inline]{Hay que cambiar la numeración, pues Naive Bayes y KNN debería estar dentro de Clasificadores Generativos, pero tienen su tema ellos solos}
+
+\subsection{Clasificadores discriminativos}
+El coste de hacer LDA es cuadrático en la dimensión de los datos ($d$). Vamos a intentar mejorarlo haciendo como en regresión:
+
+\begin{equation*}
+    P(C_1 | x) = g(w^Tx)
+\end{equation*}
+
+Pero ahora nuestros datos siguen una distribución Bernuilli. Nuestro modelo (para $K = 2$) será:
+
+\begin{equation*}
+    P(t | x) =
+    \begin{cases}
+        g(w^Tx) &\text{si } t = 1 \\
+        1 - g(w^Tx) &\text{si } t = 0
+    \end{cases}
+\end{equation*}
+
+Los parámetros serán $w$ ($\theta$)
+
+\begin{align*}
+    -l(\theta) &= -\ln \mathcal{L}(\theta) \\
+    %
+    &= -\ln P(T | D) \\
+    %
+    &= -\ln \prod_{n = 1}^{N} P(t_n | x_n) \\
+    %
+    &= -\ln \prod_{n = 1}^{N} g(w^Tx_n)^{t_n}[1 - g(w^Tx_n)]^{1 - t_i}
+\end{align*}
+
+Para simplificar la notación, diremos que $y_n = g(w^Tx)$, y entonces la función de error queda:
+
+\begin{equation*}
+    E(w) = -\sum_{n = 1}^{N}
+    \Big[
+        t_i\ln y_n + (1 - t_i)\ln(1 - y_n)
+    \Big]
+\end{equation*}
+
+
+Esta función se llama función de entropía cruzada (\textit{cross-entropy}). Ahora habría que derivarla e igualarla a 0 para encontrar los valores de $w$ más verosímiles.
+
+
+\todo[inline]{Hacer la derivada de la función cross-entropy}
+
+\todo[inline]{Explicar la interpretación de la regresión logística}

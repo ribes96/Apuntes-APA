@@ -1,0 +1,30 @@
+\section{Redes neuronales}
+Hasta ahora nuestros modelos eran de la forma $y(x; w) = g(w^T\phi(x))$. Son lineales porque $w$ hace una operación lineal. Para salir del mundo lineal, pondremos operaciones no lineales en las funciones de base. Serán funciones de base parametrizadas:
+
+\begin{equation*}
+\begin{aligned}[c]
+    \phi(x,v) && x,v \in \mathbb{R}^d
+\end{aligned}
+\end{equation*}
+
+En redes neuronales, las funciones serán:
+
+\begin{equation*}
+\begin{aligned}[c]
+    \phi_i(x) = \phi(\varphi(x, v_i)) && x,v \in \mathbb{R}^d
+\end{aligned}
+\end{equation*}
+
+Donde $v_i$ son parámetros de la neurona $i$.
+
+El modelo resultanten es:
+
+\begin{align*}
+    y(x,w,\{v\}) &= g(w^T\phi(x)) \\
+    %
+    &= g(\sum_{1}^{n - 1} w_i\phi_i(x) + \phi_0) \\
+    %
+    &= g(\sum_{1}^{n - 1} w_i\phi(\varphi(x, v_i)) + \phi_0) \\
+    %
+    &= g(\sum_{1}^{n - 1} w_i\phi(\sum_{j = 1}^{d} v_{ij}x_j + v_{i0}) + \phi_0) \\
+\end{align*}

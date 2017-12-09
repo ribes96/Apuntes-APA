@@ -1,10 +1,13 @@
-\contentsline {todo}{Reducci\IeC {\'o}n de dimensi\IeC {\'o}n con FDA}{9}
-\contentsline {todo}{Formalizar el algoritmo de k-means y demostrar que es correcto}{10}
+\contentsline {todo}{Reducci\IeC {\'o}n de dimensi\IeC {\'o}n con FDA}{10}
+\contentsline {todo}{Formalizar el algoritmo de k-means y demostrar que es correcto}{11}
 \contentsline {todo}{\IeC {\textquestiondown }C\IeC {\'o}mo encontrar los par\IeC {\'a}metros adecuados de una MoG mediente la m\IeC {\'a}xima verosimilitud.}{12}
 \contentsline {todo}{Explicar la relaci\IeC {\'o}n que hay entre k-means y E-M (el de MoG)}{12}
-\contentsline {todo}{Poner y explicar el teorema que demuestra que la matriz de dise\IeC {\~n}o para resolver las equciones de Gauss tiene inversa}{14}
+\contentsline {todo}{Poner y explicar el teorema que demuestra que la matriz de dise\IeC {\~n}o para resolver las equciones de Gauss tiene inversa}{15}
 \contentsline {todo}{Terminar de explicar como funciona la SVD (Singular Value Decomposition)}{15}
 \contentsline {todo}{Explicar la regularizaci\IeC {\'o}n (con lambda) con el m\IeC {\'e}todo de m\IeC {\'\i }nimos cuadrados}{15}
-\contentsline {todo}{Explicar de d\IeC {\'o}nde viene la f\IeC {\'o}rmula de Bayes y poner el ejemplo de los Halcones y las \IeC {\'A}guilas }{15}
-\contentsline {todo}{Explicar los problemas en QDA y LDA cuando hay m\IeC {\'a}s atributos que n\IeC {\'u}mero de ejemplos o cuando las matrices de varianza no son invertibles.}{17}
-\contentsline {todo}{Explicar tambi\IeC {\'e}n RDA}{17}
+\contentsline {todo}{Explicar de d\IeC {\'o}nde viene la f\IeC {\'o}rmula de Bayes y poner el ejemplo de los Halcones y las \IeC {\'A}guilas }{16}
+\contentsline {todo}{Explicar los problemas en QDA y LDA cuando hay m\IeC {\'a}s atributos que n\IeC {\'u}mero de ejemplos o cuando las matrices de varianza no son invertibles.}{18}
+\contentsline {todo}{Explicar tambi\IeC {\'e}n RDA}{18}
+\contentsline {todo}{Hay que cambiar la numeraci\IeC {\'o}n, pues Naive Bayes y KNN deber\IeC {\'\i }a estar dentro de Clasificadores Generativos, pero tienen su tema ellos solos}{19}
+\contentsline {todo}{Hacer la derivada de la funci\IeC {\'o}n cross-entropy}{20}
+\contentsline {todo}{Explicar la interpretaci\IeC {\'o}n de la regresi\IeC {\'o}n log\IeC {\'\i }stica}{20}
