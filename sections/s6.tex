@@ -17,7 +17,7 @@ En redes neuronales, las funciones serán:
 
 Donde $v_i$ son parámetros de la neurona $i$.
 
-El modelo resultanten es:
+El modelo resultante es:
 
 \begin{align*}
     y(x,w,\{v\}) &= g(w^T\phi(x)) \\
@@ -27,4 +27,63 @@ El modelo resultanten es:
     &= g(\sum_{1}^{n - 1} w_i\phi(\varphi(x, v_i)) + \phi_0) \\
     %
     &= g(\sum_{1}^{n - 1} w_i\phi(\sum_{j = 1}^{d} v_{ij}x_j + v_{i0}) + \phi_0) \\
+\end{align*}
+
+La función $g$ dependerá del tipo de problema que tengamos. Si se trata de un problema de regresión será la identidad, mientras que si se trata de un problema clasificación será la función logística.
+
+La función $\phi$, que cada neurona tiene asociada, será la función de activación. Hay muchas válidas. La idea es que si el valor de entrada no supera un cierto humbral, la función da salida nula ($0$), y si lo supera ya da otros valores. Puede ser la logística, o incluso una función no derivable.
+
+La topología que se define es la siguiente: cada neurona recibe como entrada un vector, cada uno de los elementos de este vector se multiplica por un peso y se suma todo. Después se pasa por la función de activación y devuelve un resultado. Esto lo hacen todas las neuronas en paralelo, todas ellas dan un resultado y lo pasan a la neurona de salida. Esta última ya hace lo mismo que se hacía en modelos lineales, y saca el resultado.
+
+Entonces, se puede ver que las redes neuronales no son más que una generalización de los modelos lineales: una red neuronal será un modelo lineal cuando no tenga ninguna neurona en la capa intermedia.
+
+Esta capa intermedia se llama capa oculta. También está la capa de salida, y en algunos libros se refieren a la entrada como la neurona de entrada, aunque realmente no hace nada.
+
+Los mismo que se ha hecho para pasar de un modelo lineal a uno no lineal se puede seguir haciendo. Lo único que hay que hacer es añadir más capas de neuronas a la capa oculta. La única condición es que las neuronas que están en una misma capa no pueden estar conectadas entre ellas.
+
+Igual que en los modelos lineales, es bueno que cada neurona tenga un $w_0$ a modo de bias. Para simplificar la notación, cada neurona tendrá siempre una entrada a $1$, y $w_0$ no será más que el peso asociado a esa entrada. La neurona de salida también tendrá esa entrada ficticia.
+
+\subsection{El algoritmo de backpropagation}
+
+Tenemos un MLP (Perceptrón Multi-capa) con $c$ capas ocultas y una capa de salida. Definimos $h_l$ como el númeoro de neuronas de la capa $l$, y entonces $h_0 = d$ (la cantidad de datos de entrada) (para simplificar la notación aquí se ha considerado a la entada como una capa más, la capa de entrada) y $h_c = m$ (la cantidad de datos de salida)
+
+Nuestro modelo será entonces:
+
+\begin{align*}
+    y: \mathbb{R}^d \longmapsto \mathbb{R}^m
+\end{align*}
+
+
+
+La notación que usaremos será:
+\begin{itemize}
+    \item $w_{ji}^l$ es el peso que conecta la neurona $i$ de la capa $l-1$ con la neurona $j$ de la capa $l$
+    \item $W_l$ es la matriz de todos los pesos que unen la capa $l-1$ con la capa $l$, i.e. : $(w_{ji}^l)_{ij}$
+    \item $\mathcal{W}$ es el vector que contiene todas las matrices $W_l$, o una matriz tridimensional.
+\end{itemize}
+
+La salida $k$ será:
+
+\begin{align*}
+    y_k(x) = \sum_{j = 0}^{h_c} w_{kj}^{c + 1}\phi_{j}^{c}(x) & & k = 1,\dots,m
+\end{align*}
+
+Donde
+\begin{align*}
+    \phi_{j}^{l} = \Phi
+    \Big(
+        \sum_{i = 1}^{h_{l - 1}} w_{ji}^{l}\phi_{i}^{l -1}(x)
+    \Big)
+\end{align*}
+
+Y
+\begin{align*}
+    \phi_i^0(x) = x_i \\
+    \phi_0^l(x) = 1
+\end{align*}
+
+Para el caso de regresión, definiremos la función de error como:
+
+\begin{align*}
+    E(\mathcal{W}) = \frac{1}{2}\sum_{n = 1}^{N}\sum_{k = 1}^{m} (t_{nk} - y_k(x_n))^2
 \end{align*}
